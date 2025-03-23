@@ -1,0 +1,7 @@
+/.direnv/
+/.envrc
+/codemirror-*.vsix
+/dist/
+/logo.png
+/logo.svg
+node_modules/

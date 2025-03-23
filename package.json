@@ -1,0 +1,38 @@
+{
+  "publisher": "samestep",
+  "name": "codemirror",
+  "version": "0.0.0",
+  "displayName": "CodeMirror",
+  "description": "CodeMirror as a VS Code extension.",
+  "icon": "logo.png",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samestep/codemirror-vscode"
+  },
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codemirror.open",
+        "title": "Open in CodeMirror"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@resvg/resvg-js-cli": "^2.6.2-beta.1",
+    "@types/vscode": "^1",
+    "@vscode/vsce": "^3",
+    "esbuild": "^0.25"
+  },
+  "scripts": {
+    "svg": "wget --no-clobber https://raw.githubusercontent.com/codemirror/website/b7247cacfcd389e359a038a41fff679185538ef8/site/style/logo.svg",
+    "png": "resvg-js logo.svg logo.png",
+    "js": "esbuild src/extension.ts --bundle --format=cjs --external:vscode --outfile=dist/extension.js",
+    "vsix": "vsce package",
+    "build": "npm run svg && npm run png && npm run js && npm run vsix"
+  }
+}
