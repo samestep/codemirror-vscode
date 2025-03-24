@@ -26,13 +26,21 @@
     "@resvg/resvg-js-cli": "^2.6.2-beta.1",
     "@types/vscode": "^1",
     "@vscode/vsce": "^3",
-    "esbuild": "^0.25"
+    "codemirror": "^6",
+    "esbuild": "^0.25",
+    "prettier-plugin-organize-imports": "^4"
   },
   "scripts": {
     "svg": "wget --no-clobber https://raw.githubusercontent.com/codemirror/website/b7247cacfcd389e359a038a41fff679185538ef8/site/style/logo.svg",
     "png": "resvg-js logo.svg logo.png",
-    "js": "esbuild src/extension.ts --bundle --format=cjs --external:vscode --outfile=dist/extension.js",
+    "webview": "esbuild src/webview.ts --bundle --format=iife --outfile=dist/webview.js",
+    "extension": "esbuild src/extension.ts --bundle --format=cjs --external:vscode --outfile=dist/extension.js",
     "vsix": "vsce package",
-    "build": "npm run svg && npm run png && npm run js && npm run vsix"
+    "build": "npm run svg && npm run png && npm run webview && npm run extension && npm run vsix"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-organize-imports"
+    ]
   }
 }
