@@ -28,4 +28,4 @@ Use the **Open in CodeMirror** command to open the current file in a new CodeMir
 
 ## License
 
-This project is licensed under the MIT license.
+This project is licensed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License).
