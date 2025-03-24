@@ -6,7 +6,7 @@
 
 In 2012, Bret Victor gave a talk titled [Inventing on Principle](https://youtu.be/PUv66718DII), in which he showed a demo of editing a JavaScript file that was being re-executed immediately on every change, with a little widget to edit numbers by dragging the mouse in an analog fashion instead of just typing:
 
-[![Inventing on Principle](images/bret-victor.png)](https://youtu.be/PUv66718DII?t=253)
+[![Inventing on Principle](images/bret-victor.png)](https://youtu.be/PUv66718DII?t=252)
 
 As of 2025, this sort of thing is not possible in Visual Studio Code, which [73.6% of developers "use regularly" according to the 2024 Stack Overflow Developer Survey](https://survey.stackoverflow.co/2024/technology#1-integrated-development-environment). However, it is possible in CodeMirror; for instance, here's a short demo video of [CodeMirror Interact by Replit](https://github.com/replit/codemirror-interact):
 
