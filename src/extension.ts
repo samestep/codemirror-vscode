@@ -1,6 +1,15 @@
+import Handlebars from "handlebars";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as vscode from "vscode";
 
 export const activate = (context: vscode.ExtensionContext) => {
+  const template = Handlebars.compile(
+    fs.readFileSync(
+      path.join(context.extensionPath, "src", "webview.hbs"),
+      "utf8",
+    ),
+  );
   context.subscriptions.push(
     vscode.commands.registerCommand("codemirror.open", () => {
       const active = vscode.window.activeTextEditor;
@@ -17,19 +26,7 @@ export const activate = (context: vscode.ExtensionContext) => {
       const script = webview.asWebviewUri(
         vscode.Uri.joinPath(context.extensionUri, "dist", "webview.js"),
       );
-      webview.html = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
-<body>
-  <div id="editor"></div>
-  <script src="${script}"></script>
-</body>
-</html>
-`;
+      webview.html = template({ script });
       webview.postMessage(active.document.getText());
     }),
   );

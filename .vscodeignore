@@ -4,3 +4,4 @@
 !dist
 !logo.png
 !package.json
+!src/webview.hbs
