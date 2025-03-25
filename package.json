@@ -23,14 +23,18 @@
     ]
   },
   "devDependencies": {
+    "@codemirror/state": "^6",
     "@resvg/resvg-js-cli": "^2.6.2-beta.1",
     "@types/node": "^22",
     "@types/vscode": "^1",
+    "@types/vscode-webview": "^1",
     "@vscode/vsce": "^3",
     "codemirror": "^6",
     "esbuild": "^0.25",
     "handlebars": "^4",
-    "prettier-plugin-organize-imports": "^4"
+    "prettier-plugin-organize-imports": "^4",
+    "y-codemirror.next": "^0.3",
+    "yjs": "^13"
   },
   "scripts": {
     "svg": "wget --no-clobber https://raw.githubusercontent.com/codemirror/website/b7247cacfcd389e359a038a41fff679185538ef8/site/style/logo.svg",

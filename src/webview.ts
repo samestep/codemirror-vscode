@@ -1,12 +1,9 @@
 import { EditorView, basicSetup } from "codemirror";
+import { sync } from "./sync-webview";
 
-const view = new EditorView({
-  extensions: [basicSetup],
+const vscode = acquireVsCodeApi();
+
+new EditorView({
+  extensions: [basicSetup, sync({ vscode })],
   parent: document.getElementById("editor") as HTMLElement,
-});
-
-window.addEventListener("message", (event) => {
-  view.dispatch({
-    changes: { from: 0, to: view.state.doc.length, insert: event.data },
-  });
 });
