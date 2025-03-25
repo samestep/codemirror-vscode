@@ -70,8 +70,9 @@ export const sync = ({
   const listener = EditorView.updateListener.of((update) => {
     const diff = codemirrorToDiff(update.changes);
     doc = doc.edit(diff);
-    if (tmp !== undefined && doc.equals(tmp)) return;
+    const expected = tmp;
     tmp = undefined;
+    if (expected !== undefined && doc.equals(expected)) return;
     const prior = patch;
     patch = patches.length;
     patches.push({ prior, diff });
