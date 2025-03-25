@@ -59,12 +59,19 @@ export const sync = ({
   const versions = new Map<Version, Doc>();
   const patches: PatchInfo[] = [];
   const versionPatches = new Map<Patch, Version>();
+  let tmp: Doc | undefined = undefined;
+  const reset = (document: Doc) => {
+    tmp = document;
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: tmp.toString() },
+    });
+  };
 
   const listener = EditorView.updateListener.of((update) => {
     const diff = codemirrorToDiff(update.changes);
-    const edited = doc.edit(diff);
-    if (edited.equals(doc)) return;
-    doc = edited;
+    doc = doc.edit(diff);
+    if (tmp !== undefined && doc.equals(tmp)) return;
+    tmp = undefined;
     const prior = patch;
     patch = patches.length;
     patches.push({ prior, diff });
@@ -83,8 +90,8 @@ export const sync = ({
     switch (request.kind) {
       case "version": {
         const { previous, version, patch: versionPatch, diff } = request;
-        doc = versions.get(previous)!.edit(new Diff(...diff));
-        versions.set(version, doc);
+        const versionDoc = versions.get(previous)!.edit(new Diff(...diff));
+        versions.set(version, versionDoc);
         if (versionPatch !== undefined) {
           // In this case, the extension told us that this update corresponds to
           // a patch we've already sent in the past, so there are no conflicts
@@ -96,13 +103,7 @@ export const sync = ({
           patches.push({});
           versionPatches.set(patch, version);
           respond<VersionResponse>({ patch });
-          view.dispatch({
-            changes: {
-              from: 0,
-              to: view.state.doc.length,
-              insert: doc.toString(),
-            },
-          });
+          reset(versionDoc);
         }
         break;
       }
@@ -113,7 +114,7 @@ export const sync = ({
       case "start": {
         const { version, text } = response as StartResponse;
         patch = patchStart;
-        doc = new Doc(text);
+        reset(new Doc(text));
         versions.set(version, doc);
         patches.push({});
         versionPatches.set(patchStart, version);
