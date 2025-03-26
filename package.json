@@ -23,11 +23,13 @@
     ]
   },
   "devDependencies": {
+    "@babel/runtime": "^7",
     "@codemirror/state": "^6",
     "@resvg/resvg-js-cli": "^2.6.2-beta.1",
     "@types/node": "^22",
     "@types/vscode": "^1",
     "@types/vscode-webview": "^1",
+    "@uiw/codemirror-theme-vscode": "^4",
     "@vscode/vsce": "^3",
     "codemirror": "^6",
     "esbuild": "^0.25",
