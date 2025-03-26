@@ -4,6 +4,7 @@
       "codemirror": ["language", "state", "view"],
       "lezer": ["common"]
     },
+    "collab": { "codemirror": ["state"] },
     "commands": {
       "codemirror": ["language", "state", "view"],
       "lezer": ["common"]
