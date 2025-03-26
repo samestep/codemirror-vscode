@@ -1,0 +1,153 @@
+{
+  "codemirror": {
+    "autocomplete": {
+      "codemirror": ["language", "state", "view"],
+      "lezer": ["common"]
+    },
+    "commands": {
+      "codemirror": ["language", "state", "view"],
+      "lezer": ["common"]
+    },
+    "lang-angular": {
+      "codemirror": ["lang-html", "lang-javascript", "language"],
+      "lezer": ["common", "highlight", "lr"]
+    },
+    "lang-cpp": { "codemirror": ["language"], "lezer": ["cpp"] },
+    "lang-css": {
+      "codemirror": ["autocomplete", "language", "state"],
+      "lezer": ["common", "css"]
+    },
+    "lang-go": {
+      "codemirror": ["autocomplete", "language", "state"],
+      "lezer": ["common", "go"]
+    },
+    "lang-html": {
+      "codemirror": [
+        "autocomplete",
+        "lang-css",
+        "lang-javascript",
+        "language",
+        "state",
+        "view"
+      ],
+      "lezer": ["common", "css", "html"]
+    },
+    "lang-java": { "codemirror": ["language"], "lezer": ["java"] },
+    "lang-javascript": {
+      "codemirror": ["autocomplete", "language", "lint", "state", "view"],
+      "lezer": ["common", "javascript"]
+    },
+    "lang-json": { "codemirror": ["language"], "lezer": ["json"] },
+    "lang-less": {
+      "codemirror": ["lang-css", "language"],
+      "lezer": ["common", "highlight", "lr"]
+    },
+    "lang-lezer": {
+      "codemirror": ["language", "state"],
+      "lezer": ["common", "lezer"]
+    },
+    "lang-liquid": {
+      "codemirror": ["autocomplete", "lang-html", "language", "state", "view"],
+      "lezer": ["common", "highlight", "lr"]
+    },
+    "lang-markdown": {
+      "codemirror": ["autocomplete", "lang-html", "language", "state", "view"],
+      "lezer": ["common", "markdown"]
+    },
+    "lang-php": {
+      "codemirror": ["lang-html", "language", "state"],
+      "lezer": ["common", "php"]
+    },
+    "lang-python": {
+      "codemirror": ["autocomplete", "language", "state"],
+      "lezer": ["common", "python"]
+    },
+    "lang-rust": { "codemirror": ["language"], "lezer": ["rust"] },
+    "lang-sass": {
+      "codemirror": ["lang-css", "language", "state"],
+      "lezer": ["common", "sass"]
+    },
+    "lang-sql": {
+      "codemirror": ["autocomplete", "language", "state"],
+      "lezer": ["common", "highlight", "lr"]
+    },
+    "language": {
+      "codemirror": ["state", "view"],
+      "lezer": ["common", "highlight", "lr"]
+    },
+    "language-data": {
+      "codemirror": [
+        "lang-angular",
+        "lang-cpp",
+        "lang-css",
+        "lang-go",
+        "lang-html",
+        "lang-java",
+        "lang-javascript",
+        "lang-json",
+        "lang-less",
+        "lang-liquid",
+        "lang-markdown",
+        "lang-php",
+        "lang-python",
+        "lang-rust",
+        "lang-sass",
+        "lang-sql",
+        "lang-vue",
+        "lang-wast",
+        "lang-xml",
+        "lang-yaml",
+        "language"
+      ]
+    },
+    "lang-vue": {
+      "codemirror": ["lang-html", "lang-javascript", "language"],
+      "lezer": ["common", "highlight", "lr"]
+    },
+    "lang-wast": {
+      "codemirror": ["language"],
+      "lezer": ["common", "highlight", "lr"]
+    },
+    "lang-xml": {
+      "codemirror": ["autocomplete", "language", "state", "view"],
+      "lezer": ["common", "xml"]
+    },
+    "lang-yaml": {
+      "codemirror": ["autocomplete", "language", "state"],
+      "lezer": ["common", "highlight", "lr", "yaml"]
+    },
+    "lint": { "codemirror": ["state", "view"] },
+    "merge": {
+      "codemirror": ["language", "state", "view"],
+      "lezer": ["highlight"]
+    },
+    "search": { "codemirror": ["state", "view"] },
+    "state": {},
+    "theme-one-dark": {
+      "codemirror": ["language", "state", "view"],
+      "lezer": ["highlight"]
+    },
+    "view": { "codemirror": ["state"] }
+  },
+  "lezer": {
+    "common": {},
+    "cpp": { "lezer": ["common", "highlight", "lr"] },
+    "css": { "lezer": ["common", "highlight", "lr"] },
+    "generator": { "lezer": ["common", "lr"] },
+    "go": { "lezer": ["common", "highlight", "lr"] },
+    "highlight": { "lezer": ["common"] },
+    "html": { "lezer": ["common", "highlight", "lr"] },
+    "java": { "lezer": ["common", "highlight", "lr"] },
+    "javascript": { "lezer": ["common", "highlight", "lr"] },
+    "json": { "lezer": ["common", "highlight", "lr"] },
+    "lezer": { "lezer": ["highlight", "lr"] },
+    "lr": { "lezer": ["common"] },
+    "markdown": { "lezer": ["common", "highlight"] },
+    "php": { "lezer": ["common", "highlight", "lr"] },
+    "python": { "lezer": ["common", "highlight", "lr"] },
+    "rust": { "lezer": ["common", "highlight", "lr"] },
+    "sass": { "lezer": ["common", "highlight", "lr"] },
+    "xml": { "lezer": ["common", "highlight", "lr"] },
+    "yaml": { "lezer": ["common", "highlight", "lr"] }
+  }
+}

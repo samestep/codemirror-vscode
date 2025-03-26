@@ -1,5 +1,5 @@
 import { ChangeSet, EditorState, Extension } from "@codemirror/state";
-import { EditorView } from "codemirror";
+import { EditorView } from "@codemirror/view";
 import { WebviewApi } from "vscode-webview";
 import {
   ExtensionRequest,

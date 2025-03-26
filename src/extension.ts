@@ -2,6 +2,7 @@ import Handlebars from "handlebars";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as vscode from "vscode";
+import modules from "./modules.json";
 import { sync } from "./sync-extension";
 import { Subscriber } from "./util";
 
@@ -52,21 +53,20 @@ const open = async (
 
   sync({ log, extensions, document, sub, webview });
 
-  const codemirrorState = webview
-    .asWebviewUri(
-      vscode.Uri.joinPath(context.extensionUri, "dist", "codemirror-state.js"),
-    )
-    .toString();
-  const codemirrorView = webview
-    .asWebviewUri(
-      vscode.Uri.joinPath(context.extensionUri, "dist", "codemirror-view.js"),
-    )
-    .toString();
   const importmap = {
-    imports: {
-      "@codemirror/state": codemirrorState,
-      "@codemirror/view": codemirrorView,
-    },
+    imports: Object.fromEntries(
+      Object.entries(modules).flatMap(([org, packages]) =>
+        Object.keys(packages).map((name) => {
+          const uri = vscode.Uri.joinPath(
+            context.extensionUri,
+            "dist",
+            org,
+            `${name}.js`,
+          );
+          return [`@${org}/${name}`, webview.asWebviewUri(uri).toString()];
+        }),
+      ),
+    ),
   };
   log.trace("import map:", importmap);
   const script = webview
