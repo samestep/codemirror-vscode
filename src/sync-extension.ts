@@ -8,6 +8,7 @@ import {
   PatchResponse,
   StartResponse,
   Version,
+  VersionRequest,
   VersionResponse,
   WebviewRequest,
   WebviewResponse,
@@ -77,9 +78,16 @@ export const sync = ({
   const patches = new Map<Patch, PatchInfo>();
   const versionPatches = new Map<Patch, Version>();
   let waiting: Patch | undefined = undefined;
+  let hope: Diff | undefined = undefined;
 
-  const propose = async (patch: Patch) => {
-    log.trace("proposing patch:", patch);
+  const propose = async () => {
+    const proposed = waiting;
+    if (proposed === undefined) {
+      log.error("no patch to propose");
+      return;
+    }
+    let patch = proposed;
+    log.trace("proposing patch:", proposed);
     const stack: Diff[] = [];
     let v = versionPatches.get(patch);
     while (v === undefined) {
@@ -98,12 +106,16 @@ export const sync = ({
       waiting = undefined;
       return;
     }
-    const diff = Diff.flatten(stack.reverse());
-    log.trace("applying VS Code document change:", diff);
-    const edit = diffToVscode(document, diff);
+    hope = Diff.flatten(stack.reverse());
+    log.trace("applying VS Code document change:", hope);
+    const edit = diffToVscode(document, hope);
     const applied = await vscode.workspace.applyEdit(edit);
-    if (!applied) log.warn("failed to apply VS Code document change:", diff);
-    waiting = undefined;
+    if (!applied) log.warn("failed to apply VS Code document change:", hope);
+    hope = undefined;
+    if (waiting !== undefined) {
+      if (waiting === proposed) waiting = undefined;
+      else setTimeout(() => propose(), 0);
+    }
   };
 
   // On new VS Code doc versions, update our `Doc` and notify the webview.
@@ -111,12 +123,20 @@ export const sync = ({
     if (event.document !== document) return;
     const previous = version;
     ({ version } = event.document);
-    if (waiting !== undefined) propose(waiting);
     if (version === previous) return;
     const diff = vscodeToDiff(event.contentChanges);
     log.trace("VS Code document changed:", diff);
-    doc = doc.edit(diff);
-    postRequest({ kind: "version", previous, version, diff: diff.data() });
+    const request: VersionRequest = {
+      kind: "version",
+      previous,
+      version,
+      diff: diff.data(),
+    };
+    const edited = doc.edit(diff);
+    if (hope !== undefined && edited.equals(doc.edit(hope)))
+      request.patch = waiting;
+    doc = edited;
+    postRequest(request);
   });
 
   const onRequest = (
@@ -142,7 +162,7 @@ export const sync = ({
         respond<PatchResponse>({});
         if (waiting === undefined) {
           waiting = patch;
-          propose(patch);
+          propose();
         } else waiting = patch;
         break;
       }
