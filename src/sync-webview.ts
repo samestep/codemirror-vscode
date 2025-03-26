@@ -108,9 +108,9 @@ class State {
     const doc = this.versions.get(previous)!.edit(new Diff(...diff));
     this.versions.set(version, doc);
     if (patch !== undefined) {
-      // In this case, the extension told us that this update corresponds to
-      // a patch we've already sent in the past, so there are no conflicts
-      // and thus we don't need to modify our editor state.
+      // In this case, the extension told us that this update corresponds to a
+      // patch we've already sent in the past, so there are no conflicts and
+      // thus we don't need to modify our editor state.
       respond({ patch });
     } else {
       this.reset(doc);
