@@ -20,7 +20,22 @@
         "command": "codemirror.open",
         "title": "Open in CodeMirror"
       }
-    ]
+    ],
+    "configuration": {
+      "properties": {
+        "codemirror.extensions": {
+          "description": "Commands to call to get URIs for CodeMirror extension bundles.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "codemirror.extension.basicSetup",
+            "codemirror.extension.vscodeDark"
+          ]
+        }
+      }
+    }
   },
   "devDependencies": {
     "@babel/runtime": "^7",
@@ -39,10 +54,16 @@
   "scripts": {
     "svg": "wget --no-clobber https://raw.githubusercontent.com/codemirror/website/b7247cacfcd389e359a038a41fff679185538ef8/site/style/logo.svg",
     "png": "resvg-js logo.svg logo.png",
-    "webview": "esbuild src/webview.ts --bundle --format=iife --outfile=dist/webview.js",
+    "codemirror-state": "esbuild src/codemirror-state.ts --bundle --format=esm --outfile=dist/codemirror-state.js",
+    "codemirror-view": "esbuild src/codemirror-view.ts --bundle --format=esm --external:@codemirror/state --outfile=dist/codemirror-view.js",
+    "codemirror": "npm run codemirror-state && npm run codemirror-view",
+    "extension:basicSetup": "esbuild src/extensions/basicSetup.ts --bundle --format=esm --external:@codemirror/state --external:@codemirror/view --outfile=dist/extensions/basicSetup.js",
+    "extension:vscodeDark": "esbuild src/extensions/vscodeDark.ts --bundle --format=esm --external:@codemirror/state --external:@codemirror/view --outfile=dist/extensions/vscodeDark.js",
+    "extensions": "npm run extension:basicSetup && npm run extension:vscodeDark",
+    "webview": "esbuild src/webview.ts --bundle --format=esm --external:@codemirror/state --external:@codemirror/view --outfile=dist/webview.js",
     "extension": "esbuild src/extension.ts --bundle --format=cjs --platform=node --external:vscode --outfile=dist/extension.js",
     "vsix": "vsce package",
-    "build": "npm run svg && npm run png && npm run webview && npm run extension && npm run vsix"
+    "build": "npm run svg && npm run png && npm run codemirror && npm run extensions && npm run webview && npm run extension && npm run vsix"
   },
   "prettier": {
     "plugins": [

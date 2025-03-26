@@ -48,11 +48,13 @@ const diffToVscode = (
 
 export const sync = ({
   log,
+  extensions,
   document,
   sub,
   webview,
 }: {
   log: vscode.LogOutputChannel;
+  extensions: vscode.Uri[];
   document: vscode.TextDocument;
   sub: Subscriber;
   webview: vscode.Webview;
@@ -153,7 +155,13 @@ export const sync = ({
         versionPatches.clear();
         waiting = undefined;
         versionPatches.set(request.patch, version);
-        respond<StartResponse>({ version, text: document.getText() });
+        respond<StartResponse>({
+          extensions: extensions.map((uri) =>
+            webview.asWebviewUri(uri).toString(),
+          ),
+          version,
+          text: document.getText(),
+        });
         break;
       }
       case "patch": {

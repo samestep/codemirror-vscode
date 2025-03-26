@@ -23,16 +23,19 @@ interface Resp<T> {
   body: T;
 }
 
-/** Webview to extension: send the initial version. */
+/** Webview to extension: send the initial configuration. */
 export interface StartRequest {
   kind: "start";
 
-  /** The patch number pre-allocated for the initial version. */
+  /** The patch number pre-allocated for the initial document version. */
   patch: Patch;
 }
 
-/** Extension responding to webview: here is the initial version. */
+/** Extension responding to webview: here is the initial configuration. */
 export interface StartResponse {
+  /** CodeMirror extension URIs. */
+  extensions: string[];
+
   /** Initial version number. */
   version: Version;
 

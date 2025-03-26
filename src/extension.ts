@@ -6,14 +6,23 @@ import { sync } from "./sync-extension";
 import { Subscriber } from "./util";
 
 interface HtmlParams {
+  importmap: string;
   script: string;
 }
 
-const open = (
+const open = async (
   context: vscode.ExtensionContext,
   log: vscode.LogOutputChannel,
   template: Handlebars.TemplateDelegate<HtmlParams>,
 ) => {
+  const extensions = await Promise.all(
+    (
+      vscode.workspace
+        .getConfiguration("codemirror")
+        .get<string[]>("extensions") ?? []
+    ).map((command) => vscode.commands.executeCommand<vscode.Uri>(command)),
+  );
+
   const active = vscode.window.activeTextEditor;
   if (active === undefined) {
     vscode.window.showErrorMessage("no active editor to open in CodeMirror");
@@ -41,15 +50,32 @@ const open = (
   // Dispose of everything else when the webview is closed.
   sub.scribe(panel.onDidDispose, () => sub.dispose());
 
-  sync({ log, document, sub, webview });
+  sync({ log, extensions, document, sub, webview });
 
+  const codemirrorState = webview
+    .asWebviewUri(
+      vscode.Uri.joinPath(context.extensionUri, "dist", "codemirror-state.js"),
+    )
+    .toString();
+  const codemirrorView = webview
+    .asWebviewUri(
+      vscode.Uri.joinPath(context.extensionUri, "dist", "codemirror-view.js"),
+    )
+    .toString();
+  const importmap = {
+    imports: {
+      "@codemirror/state": codemirrorState,
+      "@codemirror/view": codemirrorView,
+    },
+  };
+  log.trace("import map:", importmap);
   const script = webview
     .asWebviewUri(
       vscode.Uri.joinPath(context.extensionUri, "dist", "webview.js"),
     )
     .toString();
   log.trace("script as webview URI:", script);
-  webview.html = template({ script });
+  webview.html = template({ importmap: JSON.stringify(importmap), script });
 };
 
 export const activate = (context: vscode.ExtensionContext) => {
@@ -62,9 +88,24 @@ export const activate = (context: vscode.ExtensionContext) => {
   log.trace("read HTML template:\n", templateText);
   const template = Handlebars.compile<HtmlParams>(templateText);
 
+  for (const name of ["basicSetup", "vscodeDark"]) {
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        `codemirror.extension.${name}`,
+        (): vscode.Uri => {
+          return vscode.Uri.joinPath(
+            context.extensionUri,
+            "dist",
+            "extensions",
+            `${name}.js`,
+          );
+        },
+      ),
+    );
+  }
   context.subscriptions.push(
-    vscode.commands.registerCommand("codemirror.open", () => {
-      open(context, log, template);
-    }),
+    vscode.commands.registerCommand("codemirror.open", () =>
+      open(context, log, template),
+    ),
   );
 };

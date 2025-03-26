@@ -62,8 +62,8 @@ class State {
       state: EditorState.create({
         doc: text,
         extensions: [
-          ...extensions,
           EditorView.updateListener.of(({ changes }) => this.handle(changes)),
+          ...extensions,
         ],
       }),
       parent,
@@ -122,11 +122,9 @@ class State {
 
 export const sync = ({
   vscode,
-  extensions,
   parent,
 }: {
   vscode: WebviewApi<unknown>;
-  extensions: Extension[];
   parent: Element;
 }) => {
   let nextId = 0;
@@ -154,10 +152,16 @@ export const sync = ({
       }
     }
   };
-  const onResponse = (request: WebviewRequest, response: ExtensionResponse) => {
+  const onResponse = async (
+    request: WebviewRequest,
+    response: ExtensionResponse,
+  ) => {
     switch (request.kind) {
       case "start": {
-        const { version, text } = response as StartResponse;
+        const { extensions: uris, version, text } = response as StartResponse;
+        const extensions = await Promise.all(
+          uris.map(async (uri) => (await import(uri)).default),
+        );
         state = new State({ extensions, parent, postRequest, version, text });
         break;
       }
