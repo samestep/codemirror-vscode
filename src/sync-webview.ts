@@ -1,4 +1,4 @@
-import { ChangeSet, Extension } from "@codemirror/state";
+import { ChangeSet, EditorState, Extension } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { WebviewApi } from "vscode-webview";
 import {
@@ -9,18 +9,14 @@ import {
   Patch,
   StartResponse,
   Version,
+  VersionRequest,
   VersionResponse,
   WebviewRequest,
   WebviewResponse,
 } from "./protocol";
 import { Diff, Doc, Replace } from "./text";
 
-const patchStart = 0;
-
-interface PatchInfo {
-  prior?: Patch;
-  diff?: Diff;
-}
+const patchStart: Patch = 0;
 
 const codemirrorToDiff = (changes: ChangeSet): Diff => {
   const replacements: Replace[] = [];
@@ -34,6 +30,95 @@ const codemirrorToDiff = (changes: ChangeSet): Diff => {
   return new Diff(...replacements);
 };
 
+class State {
+  postRequest: (request: WebviewRequest) => void;
+  patch: Patch;
+  doc: Doc;
+  versions: Map<Version, Doc>;
+  numPatches: number;
+  suppress: boolean;
+  view: EditorView;
+
+  constructor({
+    extensions,
+    parent,
+    postRequest,
+    version,
+    text,
+  }: {
+    extensions: Extension[];
+    parent: Element;
+    postRequest: (request: WebviewRequest) => void;
+    version: Version;
+    text: string;
+  }) {
+    this.postRequest = postRequest;
+    this.patch = patchStart;
+    this.doc = new Doc(text);
+    this.versions = new Map([[version, this.doc]]);
+    this.numPatches = 1;
+    this.suppress = false;
+    this.view = new EditorView({
+      state: EditorState.create({
+        doc: text,
+        extensions: [
+          ...extensions,
+          EditorView.updateListener.of(({ changes }) => this.handle(changes)),
+        ],
+      }),
+      parent,
+    });
+  }
+
+  makePatch(): Patch {
+    return this.numPatches++;
+  }
+
+  handle(changes: ChangeSet) {
+    const diff = codemirrorToDiff(changes);
+    const edited = this.doc.edit(diff);
+    if (edited.equals(this.doc)) return;
+    const prior = this.patch;
+    this.patch = this.makePatch();
+    if (this.suppress) return;
+    this.postRequest({
+      kind: "patch",
+      prior,
+      patch: this.patch,
+      diff: diff.data(),
+    });
+  }
+
+  reset(doc: Doc) {
+    this.suppress = true;
+    this.view.dispatch({
+      changes: {
+        from: 0,
+        to: this.view.state.doc.length,
+        insert: doc.toString(),
+      },
+    });
+    this.suppress = false;
+  }
+
+  version(
+    { previous, version, patch, diff }: VersionRequest,
+    respond: (response: VersionResponse) => void,
+  ) {
+    const doc = this.versions.get(previous)!.edit(new Diff(...diff));
+    this.versions.set(version, doc);
+    if (patch !== undefined) {
+      // In this case, the extension told us that this update corresponds to
+      // a patch we've already sent in the past, so there are no conflicts
+      // and thus we don't need to modify our editor state.
+      respond({ patch });
+    } else {
+      this.reset(doc);
+      respond({ patch: this.patch });
+    }
+  }
+}
+
 export const sync = ({
   vscode,
   extensions,
@@ -42,7 +127,7 @@ export const sync = ({
   vscode: WebviewApi<unknown>;
   extensions: Extension[];
   parent: Element;
-}): EditorView => {
+}) => {
   let nextId = 0;
   const pending = new Map<Id, WebviewRequest>();
   const postRequest = (body: WebviewRequest) => {
@@ -54,35 +139,7 @@ export const sync = ({
     vscode.postMessage({ kind: "response", id, body });
   };
 
-  let patch = -1;
-  let doc = new Doc("");
-  const versions = new Map<Version, Doc>();
-  const patches: PatchInfo[] = [];
-  const versionPatches = new Map<Patch, Version>();
-  let tmp: Doc | undefined = undefined;
-  const reset = (document: Doc) => {
-    tmp = document;
-    view.dispatch({
-      changes: { from: 0, to: view.state.doc.length, insert: tmp.toString() },
-    });
-  };
-
-  const listener = EditorView.updateListener.of((update) => {
-    const diff = codemirrorToDiff(update.changes);
-    doc = doc.edit(diff);
-    const expected = tmp;
-    tmp = undefined;
-    if (expected !== undefined && doc.equals(expected)) return;
-    const prior = patch;
-    patch = patches.length;
-    patches.push({ prior, diff });
-    postRequest({ kind: "patch", prior, patch, diff: diff.data() });
-  });
-
-  const view = new EditorView({
-    extensions: [...extensions, listener],
-    parent,
-  });
+  let state: State | undefined = undefined;
 
   const onRequest = (
     request: ExtensionRequest,
@@ -90,22 +147,8 @@ export const sync = ({
   ) => {
     switch (request.kind) {
       case "version": {
-        const { previous, version, patch: versionPatch, diff } = request;
-        const versionDoc = versions.get(previous)!.edit(new Diff(...diff));
-        versions.set(version, versionDoc);
-        if (versionPatch !== undefined) {
-          // In this case, the extension told us that this update corresponds to
-          // a patch we've already sent in the past, so there are no conflicts
-          // and thus we don't need to modify our editor state.
-          versionPatches.set(versionPatch, version);
-          respond<VersionResponse>({ patch: versionPatch });
-        } else {
-          patch = patches.length;
-          patches.push({});
-          versionPatches.set(patch, version);
-          respond<VersionResponse>({ patch });
-          reset(versionDoc);
-        }
+        if (state === undefined) break;
+        state.version(request, respond);
         break;
       }
     }
@@ -114,11 +157,7 @@ export const sync = ({
     switch (request.kind) {
       case "start": {
         const { version, text } = response as StartResponse;
-        patch = patchStart;
-        reset(new Doc(text));
-        versions.set(version, doc);
-        patches.push({});
-        versionPatches.set(patchStart, version);
+        state = new State({ extensions, parent, postRequest, version, text });
         break;
       }
       case "patch": {
@@ -146,6 +185,4 @@ export const sync = ({
   });
 
   postRequest({ kind: "start", patch: patchStart }); // Ask for initial version.
-
-  return view;
 };
