@@ -1,5 +1,5 @@
 import Handlebars from "handlebars";
-import * as fs from "node:fs";
+import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import * as vscode from "vscode";
 import modules from "./modules.json";
@@ -78,17 +78,20 @@ const open = async (
   webview.html = template({ importmap: JSON.stringify(importmap), script });
 };
 
-export const activate = (context: vscode.ExtensionContext) => {
+export const activate = async (context: vscode.ExtensionContext) => {
   const log = vscode.window.createOutputChannel("CodeMirror", { log: true });
   log.info("CodeMirror extension activated");
 
   const templatePath = path.join(context.extensionPath, "src", "webview.hbs");
   log.debug("located HTML template:", templatePath);
-  const templateText = fs.readFileSync(templatePath, "utf8");
+  const templateText = await fs.readFile(templatePath, "utf8");
   log.trace("read HTML template:\n", templateText);
   const template = Handlebars.compile<HtmlParams>(templateText);
 
-  for (const name of ["basicSetup", "vscodeDark"]) {
+  for (const file of await fs.readdir(
+    path.join(context.extensionPath, "dist", "extensions"),
+  )) {
+    const name = path.basename(file, path.extname(file));
     context.subscriptions.push(
       vscode.commands.registerCommand(
         `codemirror.extension.${name}`,
@@ -97,12 +100,13 @@ export const activate = (context: vscode.ExtensionContext) => {
             context.extensionUri,
             "dist",
             "extensions",
-            `${name}.js`,
+            file,
           );
         },
       ),
     );
   }
+
   context.subscriptions.push(
     vscode.commands.registerCommand("codemirror.open", () =>
       open(context, log, template),
