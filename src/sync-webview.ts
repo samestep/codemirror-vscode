@@ -78,6 +78,7 @@ class State {
     const diff = codemirrorToDiff(changes);
     const edited = this.doc.edit(diff);
     if (edited.equals(this.doc)) return;
+    this.doc = edited;
     const prior = this.patch;
     this.patch = this.makePatch();
     if (this.suppress) return;

@@ -141,9 +141,9 @@ export const sync = ({
         patches.set(patch, { prior, diff: new Diff(...diff) });
         respond<PatchResponse>({});
         if (waiting === undefined) {
+          waiting = patch;
           propose(patch);
-        }
-        waiting = patch;
+        } else waiting = patch;
         break;
       }
     }
