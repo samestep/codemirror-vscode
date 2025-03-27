@@ -46,7 +46,7 @@ Here is a list of the CodeMirror extensions included in this VS Code extension:
 
 The default value for the `codemirror.extensions` setting only includes VS Code [command IDs](https://code.visualstudio.com/api/extension-guides/command) provided by this VS Code extension, listed above. However, commands from other VS Code extensions can be used as well, making this extension, itself, extensible. For instance, the CodeMirror Interact extension mentioned earlier is implemented as a [separate VS Code extension in this same repository](packages/codemirror-interact). And if you want, you can easily make your own VS Code extension to provide other CodeMirror extensions!
 
-For instance, let's say you want [CodeMirror support for Julia](https://www.npmjs.com/package/@plutojl/lang-julia/v/0.12.1). If you have [Node.js](https://nodejs.org/) installed, you just need to create three files. First, create a `.vscodeignore` file listing only the files you need to package:
+For instance, let's say you want [CodeMirror support for Julia](https://www.npmjs.com/package/@plutojl/lang-julia/v/0.12.1). If you have [Node.js](https://nodejs.org/) installed, you just need to create four files. First, create a `.vscodeignore` file listing only the files you need to package:
 
 ```
 **
