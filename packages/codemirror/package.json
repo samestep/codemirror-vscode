@@ -1,0 +1,87 @@
+{
+  "private": true,
+  "publisher": "samestep",
+  "name": "codemirror",
+  "version": "0.1.0",
+  "displayName": "CodeMirror",
+  "description": "CodeMirror as a VS Code extension.",
+  "icon": "logo.png",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samestep/codemirror-vscode",
+    "directory": "packages/codemirror"
+  },
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codemirror.open",
+        "title": "Open in CodeMirror"
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "codemirror.extensions": {
+          "description": "VS Code commands to execute to get CodeMirror extensions.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "codemirror.extension.basicSetup",
+            "codemirror.extension.themeVscode",
+            "codemirror.extension.lang"
+          ]
+        },
+        "codemirror.lang.html.autoCloseTags": {
+          "type": "boolean",
+          "markdownDescription": "Determines whether `autoCloseTags` is included in the support extensions. Defaults to true."
+        },
+        "codemirror.lang.html.matchClosingTags": {
+          "type": "boolean",
+          "markdownDescription": "By default, the syntax tree will highlight mismatched closing tags. Set this to `false` to turn that off (for example when you expect to only be parsing a fragment of HTML text, not a full document)."
+        },
+        "codemirror.lang.markdown.completeHTMLTags": {
+          "type": "boolean",
+          "markdownDescription": "By default, the extension installs an autocompletion source that completes HTML tags when a `<` is typed. Set this to false to disable this."
+        },
+        "codemirror.lang.php.plain": {
+          "type": "boolean",
+          "markdownDescription": "By default, PHP parsing only starts at the first `<?` marker. When you set this to true, it starts immediately at the start of the document."
+        },
+        "codemirror.lang.sql.defaultSchema": {
+          "type": "string",
+          "markdownDescription": "When given, tables prefixed with this schema name can be completed directly at the top level."
+        },
+        "codemirror.lang.sql.defaultTable": {
+          "type": "string",
+          "markdownDescription": "When given, columns from the named table can be completed directly at the top level."
+        },
+        "codemirror.lang.sql.upperCaseKeywords": {
+          "type": "boolean",
+          "markdownDescription": "When set to true, keyword completions will be upper-case."
+        },
+        "codemirror.lang.xml.autoCloseTags": {
+          "type": "boolean",
+          "markdownDescription": "Determines whether `autoCloseTags` is included in the support extensions. Defaults to true."
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "codemirror": "^6"
+  },
+  "scripts": {
+    "check": "tsc",
+    "readme": "cp ../../README.md .",
+    "svg": "wget --no-clobber https://raw.githubusercontent.com/codemirror/website/b7247cacfcd389e359a038a41fff679185538ef8/site/style/logo.svg",
+    "png": "resvg-js logo.svg logo.png",
+    "dist": "rm -rf dist && node build.mjs",
+    "vsix": "vsce package",
+    "build": "npm run readme && npm run svg && npm run png && npm run dist && npm run vsix"
+  }
+}

@@ -1,42 +1,8 @@
 {
-  "publisher": "samestep",
-  "name": "codemirror",
-  "version": "0.0.0",
-  "displayName": "CodeMirror",
-  "description": "CodeMirror as a VS Code extension.",
-  "icon": "logo.png",
-  "engines": {
-    "vscode": "^1.75.0"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/samestep/codemirror-vscode"
-  },
-  "main": "./dist/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "codemirror.open",
-        "title": "Open in CodeMirror"
-      }
-    ],
-    "configuration": {
-      "properties": {
-        "codemirror.extensions": {
-          "description": "Commands to call to get URIs for CodeMirror extension bundles.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [
-            "codemirror.extension.basicSetup",
-            "codemirror.extension.vscodeDark"
-          ]
-        }
-      }
-    }
-  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
     "@babel/runtime": "^7",
     "@codemirror/autocomplete": "^6",
@@ -90,23 +56,20 @@
     "@lezer/sass": "^1",
     "@lezer/xml": "^1",
     "@lezer/yaml": "^1",
+    "@replit/codemirror-interact": "^6",
     "@resvg/resvg-js-cli": "^2.6.2-beta.1",
     "@types/node": "^22",
     "@types/vscode": "^1",
     "@types/vscode-webview": "^1",
     "@uiw/codemirror-theme-vscode": "^4",
     "@vscode/vsce": "^3",
-    "codemirror": "^6",
     "esbuild": "^0.25",
     "handlebars": "^4",
-    "prettier-plugin-organize-imports": "^4"
+    "prettier-plugin-organize-imports": "^4",
+    "typescript": "^5"
   },
   "scripts": {
-    "svg": "wget --no-clobber https://raw.githubusercontent.com/codemirror/website/b7247cacfcd389e359a038a41fff679185538ef8/site/style/logo.svg",
-    "png": "resvg-js logo.svg logo.png",
-    "dist": "rm -rf dist && node build.mjs",
-    "vsix": "vsce package",
-    "build": "npm run svg && npm run png && npm run dist && npm run vsix"
+    "check": "tsc"
   },
   "prettier": {
     "plugins": [

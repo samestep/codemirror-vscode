@@ -1,0 +1,15 @@
+{
+  "name": "codemirror-vscode",
+  "version": "0.1.0",
+  "description": "Types for extending CodeMirror in VS Code.",
+  "license": "MIT",
+  "homepage": "https://github.com/samestep/codemirror-vscode",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samestep/codemirror-vscode",
+    "directory": "packages/codemirror-vscode"
+  },
+  "scripts": {
+    "build": ""
+  }
+}

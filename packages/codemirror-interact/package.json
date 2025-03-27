@@ -1,0 +1,31 @@
+{
+  "private": true,
+  "publisher": "samestep",
+  "name": "codemirror-interact",
+  "version": "0.1.0",
+  "displayName": "CodeMirror Interact",
+  "description": "A CodeMirror extension that lets you interact with different values (clicking, dragging, etc).",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samestep/codemirror-vscode",
+    "directory": "packages/codemirror-interact"
+  },
+  "extensionDependencies": [
+    "samestep.codemirror"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onCommand:codemirrorInteract.extension"
+  ],
+  "scripts": {
+    "check": "tsc",
+    "esm": "esbuild src/codemirror.ts --bundle --format=esm --external:@codemirror --external:@lezer --outdir=dist",
+    "cjs": "esbuild src/extension.ts --bundle --format=cjs --platform=node --external:vscode --outdir=dist",
+    "vsix": "vsce package",
+    "build": "npm run esm && npm run cjs && npm run vsix"
+  }
+}

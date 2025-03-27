@@ -24,7 +24,111 @@ This project packages CodeMirror as a [webview](https://code.visualstudio.com/ap
 
 This extension is not yet published to the VS Code Marketplace; check back later, or if you're curious then you can refer to [`CONTRIBUTING.md`](CONTRIBUTING.md) to build it from source.
 
-Use the **Open in CodeMirror** command to open the current file in a new CodeMirror editor.
+Use the **Open in CodeMirror** command to open the current file in a new CodeMirror editor. To configure CodeMirror, add or remove items from the **`codemirror.extensions`** VS Code setting:
+
+![VS Code setting for CodeMirror extensions](images/settings.png)
+
+Here is a list of the CodeMirror extensions included in this VS Code extension:
+
+- **`codemirror.extension.basicSetup`**: the `basicSetup` extension from the [`codemirror`](https://github.com/codemirror/basic-setup/tree/86f3699347713440e5b1a50b6a98d82963335d50) npm package, which "pulls together a number of extensions that you might want in a basic editor."
+
+- **`codemirror.extension.minimalSetup`**: the `minimalSetup` extension from that same `codemirror` npm package, which is a "minimal set of extensions to create a functional editor."
+
+- **`codemirror.extension.themeVscode`**: uses the VS Code [color theme kind](https://code.visualstudio.com/api/references/vscode-api#ColorThemeKind) to select between the dark and light themes provided by the [`@uiw/codemirror-theme-vscode`](https://www.npmjs.com/package/@uiw/codemirror-theme-vscode/v/4.23.10) npm package.
+
+- **`codemirror.extension.vscodeDark`**: applies the VS Code dark theme from the `@uiw/codemirror-theme-vscode` npm package.
+
+- **`codemirror.extension.vscodeLight`**: applies the VS Code light theme from the `@uiw/codemirror-theme-vscode` npm package.
+
+- **`codemirror.extension.lang`**: uses the [VS Code language identifier](https://code.visualstudio.com/docs/languages/identifiers) to load and configure the appropriate [`@codemirror/lang-*`](https://www.npmjs.com/org/codemirror) extension, if known.
+
+## Ecosystem
+
+The default value for the `codemirror.extensions` setting only includes VS Code [command IDs](https://code.visualstudio.com/api/extension-guides/command) provided by this VS Code extension, listed above. However, commands from other VS Code extensions can be used as well, making this extension, itself, extensible. For instance, the CodeMirror Interact extension mentioned earlier is implemented as a [separate VS Code extension in this same repository](packages/codemirror-interact). And if you want, you can easily make your own VS Code extension to provide other CodeMirror extensions!
+
+For instance, let's say you want [CodeMirror support for Julia](https://www.npmjs.com/package/@plutojl/lang-julia/v/0.12.1). If you have [Node.js](https://nodejs.org/) installed, you just need to create three files. First, create a `.vscodeignore` file listing only the files you need to package:
+
+```
+**
+!dist
+```
+
+Next, put metadata and build scripts in `package.json`:
+
+```json
+{
+  "publisher": "your-publisher-name",
+  "name": "codemirror-julia",
+  "version": "0.0.0",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "extensionDependencies": ["samestep.codemirror"],
+  "main": "./dist/extension.js",
+  "activationEvents": ["onCommand:codemirrorJulia.extension"],
+  "devDependencies": {
+    "@plutojl/lang-julia": "^0.12",
+    "@types/vscode": "^1",
+    "@vscode/vsce": "^3",
+    "codemirror-vscode": "^0.1",
+    "esbuild": "^0.25"
+  },
+  "scripts": {
+    "esm": "esbuild src/codemirror.ts --bundle --format=esm --external:@codemirror --external:@lezer --outdir=dist",
+    "cjs": "esbuild src/extension.ts --bundle --format=cjs --platform=node --external:vscode --outdir=dist",
+    "vsix": "vsce package --allow-missing-repository --skip-license",
+    "build": "npm run esm && npm run cjs && npm run vsix"
+  }
+}
+```
+
+Then, put your VS Code extension entry point in `src/extension.ts`:
+
+```typescript
+import { CodeMirrorContext, ExtensionData } from "codemirror-vscode";
+import * as vscode from "vscode";
+
+export const activate = (context: vscode.ExtensionContext) => {
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "codemirrorJulia.extension",
+      async (cmCtx: CodeMirrorContext): Promise<ExtensionData<[boolean]>> => ({
+        uri: cmCtx
+          .asWebviewUri(
+            vscode.Uri.joinPath(context.extensionUri, "dist", "codemirror.js"),
+          )
+          .toString(),
+        args: [cmCtx.languageId === "julia"],
+      }),
+    ),
+  );
+};
+```
+
+And put the CodeMirror extension itself in `src/codemirror.ts`:
+
+```typescript
+import { Extension } from "@codemirror/state";
+import { julia } from "@plutojl/lang-julia";
+
+export default async (activate: boolean): Promise<Extension> =>
+  activate ? julia() : [];
+```
+
+Then run a couple commands to build it:
+
+```sh
+npm install
+npm run build
+```
+
+If you're already in VS Code, right-click on the `codemirror-julia-0.0.0.vsix` file that just got created, and click **Install Extension VSIX**. Finally, add `codemirrorJulia.extension` to the `codemirror.extensions` setting, and you're done! Now you'll get syntax highlighting if you execute **Open in CodeMirror** on a Julia file, and everything will be the same for non-Julia files.
+
+This is just a simple example, but you should be able to use the same pattern for pretty much any CodeMirror extension. If this doesn't work for your use case, feel free to open a [GitHub issue](https://github.com/samestep/codemirror-vscode/issues)!
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## License
 

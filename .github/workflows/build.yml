@@ -11,7 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
-      - run: npm run build
+      - run: npm run check
+      - run: npm run --workspaces build
       - uses: actions/upload-artifact@v4
         with:
-          path: codemirror-*.vsix
+          name: codemirror
+          path: packages/codemirror/codemirror-*.vsix
+      - uses: actions/upload-artifact@v4
+        with:
+          name: codemirror-interact
+          path: packages/codemirror-interact/codemirror-interact-*.vsix

@@ -1,7 +1,9 @@
+import { CodeMirrorContext, ExtensionData } from "codemirror-vscode";
 import Handlebars from "handlebars";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import * as vscode from "vscode";
+import lang from "./lang";
 import modules from "./modules.json";
 import { sync } from "./sync-extension";
 import { Subscriber } from "./util";
@@ -16,14 +18,6 @@ const open = async (
   log: vscode.LogOutputChannel,
   template: Handlebars.TemplateDelegate<HtmlParams>,
 ) => {
-  const extensions = await Promise.all(
-    (
-      vscode.workspace
-        .getConfiguration("codemirror")
-        .get<string[]>("extensions") ?? []
-    ).map((command) => vscode.commands.executeCommand<vscode.Uri>(command)),
-  );
-
   const active = vscode.window.activeTextEditor;
   if (active === undefined) {
     vscode.window.showErrorMessage("no active editor to open in CodeMirror");
@@ -44,13 +38,32 @@ const open = async (
     "codemirror",
     `${path.basename(document.fileName)} (CodeMirror)`,
     vscode.ViewColumn.Active, // Open on top of the active editor.
-    { enableScripts: true },
+    {
+      enableScripts: true,
+
+      // Allow files from other extensions, not just this one.
+      localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, "..")],
+    },
   );
   const { webview } = panel;
   sub.add(panel); // Let the webview itself be disposed when `document` closes.
   // Dispose of everything else when the webview is closed.
   sub.scribe(panel.onDidDispose, () => sub.dispose());
 
+  const cmCtx: CodeMirrorContext = {
+    asWebviewUri: (uri) => webview.asWebviewUri(uri),
+    languageId: document.languageId,
+  };
+  log.trace("CodeMirror context:", cmCtx);
+  const extensions = await Promise.all(
+    (
+      vscode.workspace
+        .getConfiguration("codemirror")
+        .get<string[]>("extensions") ?? []
+    ).map((command) =>
+      vscode.commands.executeCommand<ExtensionData<any>>(command, cmCtx),
+    ),
+  );
   sync({ log, extensions, document, sub, webview });
 
   const importmap = {
@@ -80,7 +93,7 @@ const open = async (
 
 export const activate = async (context: vscode.ExtensionContext) => {
   const log = vscode.window.createOutputChannel("CodeMirror", { log: true });
-  log.info("CodeMirror extension activated");
+  log.info("activating CodeMirror extension");
 
   const templatePath = path.join(context.extensionPath, "src", "webview.hbs");
   log.debug("located HTML template:", templatePath);
@@ -88,26 +101,55 @@ export const activate = async (context: vscode.ExtensionContext) => {
   log.trace("read HTML template:\n", templateText);
   const template = Handlebars.compile<HtmlParams>(templateText);
 
-  for (const file of await fs.readdir(
-    path.join(context.extensionPath, "dist", "extensions"),
-  )) {
-    const name = path.basename(file, path.extname(file));
-    context.subscriptions.push(
-      vscode.commands.registerCommand(
-        `codemirror.extension.${name}`,
-        (): vscode.Uri => {
-          return vscode.Uri.joinPath(
-            context.extensionUri,
-            "dist",
-            "extensions",
-            file,
-          );
-        },
-      ),
-    );
-  }
+  const getUri = (cmCtx: CodeMirrorContext, name: string): string => {
+    const base = context.extensionUri;
+    const uri = vscode.Uri.joinPath(base, "dist", "extensions", `${name}.js`);
+    return cmCtx.asWebviewUri(uri).toString();
+  };
 
   context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "codemirror.extension.basicSetup",
+      async (cmCtx: CodeMirrorContext): Promise<ExtensionData<[]>> => {
+        return { uri: getUri(cmCtx, "basic-setup"), name: "basic", args: [] };
+      },
+    ),
+    vscode.commands.registerCommand(
+      "codemirror.extension.minimalSetup",
+      async (cmCtx: CodeMirrorContext): Promise<ExtensionData<[]>> => {
+        return { uri: getUri(cmCtx, "basic-setup"), name: "minimal", args: [] };
+      },
+    ),
+    vscode.commands.registerCommand(
+      "codemirror.extension.themeVscode",
+      async (cmCtx: CodeMirrorContext): Promise<ExtensionData<[]>> => {
+        let name = "dark";
+        switch (vscode.window.activeColorTheme.kind) {
+          case vscode.ColorThemeKind.Light:
+          case vscode.ColorThemeKind.HighContrastLight:
+            name = "light";
+        }
+        return { uri: getUri(cmCtx, "theme-vscode"), name, args: [] };
+      },
+    ),
+    vscode.commands.registerCommand(
+      "codemirror.extension.vscodeDark",
+      async (cmCtx: CodeMirrorContext): Promise<ExtensionData<[]>> => {
+        return { uri: getUri(cmCtx, "theme-vscode"), name: "dark", args: [] };
+      },
+    ),
+    vscode.commands.registerCommand(
+      "codemirror.extension.vscodeLight",
+      async (cmCtx: CodeMirrorContext): Promise<ExtensionData<[]>> => {
+        return { uri: getUri(cmCtx, "theme-vscode"), name: "light", args: [] };
+      },
+    ),
+    vscode.commands.registerCommand(
+      "codemirror.extension.lang",
+      async (cmCtx: CodeMirrorContext): Promise<ExtensionData<any>> => {
+        return lang(cmCtx) ?? { uri: getUri(cmCtx, "empty"), args: [] };
+      },
+    ),
     vscode.commands.registerCommand("codemirror.open", () =>
       open(context, log, template),
     ),

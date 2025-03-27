@@ -1,3 +1,4 @@
+import { ExtensionData } from "codemirror-vscode";
 import * as vscode from "vscode";
 import {
   ExtensionRequest,
@@ -54,7 +55,7 @@ export const sync = ({
   webview,
 }: {
   log: vscode.LogOutputChannel;
-  extensions: vscode.Uri[];
+  extensions: ExtensionData<any>[];
   document: vscode.TextDocument;
   sub: Subscriber;
   webview: vscode.Webview;
@@ -156,9 +157,7 @@ export const sync = ({
         waiting = undefined;
         versionPatches.set(request.patch, version);
         respond<StartResponse>({
-          extensions: extensions.map((uri) =>
-            webview.asWebviewUri(uri).toString(),
-          ),
+          extensions,
           version,
           text: document.getText(),
         });

@@ -160,7 +160,12 @@ export const sync = ({
       case "start": {
         const { extensions: uris, version, text } = response as StartResponse;
         const extensions = await Promise.all(
-          uris.map(async (uri) => (await import(uri)).default),
+          uris.map(async ({ uri, name, args }) => {
+            const m = await import(uri);
+            const f: (...args: any) => Promise<Extension> =
+              name === undefined ? m.default : m[name];
+            return f(...args);
+          }),
         );
         state = new State({ extensions, parent, postRequest, version, text });
         break;

@@ -1,7 +1,8 @@
+../../**
+../**
 **
 !LICENSE
 !README.md
 !dist
 !logo.png
-!package.json
 !src/webview.hbs

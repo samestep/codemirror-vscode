@@ -1,7 +1,9 @@
+.DS_Store
+*.tgz
+*.vsix
 /.direnv/
 /.envrc
-/codemirror-*.vsix
-/dist/
-/logo.png
-/logo.svg
+/packages/codemirror/logo.*
+/packages/codemirror/README.md
+dist/
 node_modules/

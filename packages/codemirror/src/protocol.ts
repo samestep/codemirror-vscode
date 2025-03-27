@@ -1,3 +1,4 @@
+import { ExtensionData } from "codemirror-vscode";
 import { Replace } from "./text";
 
 /** A message ID, unique for a given sender but not across senders. */
@@ -33,8 +34,8 @@ export interface StartRequest {
 
 /** Extension responding to webview: here is the initial configuration. */
 export interface StartResponse {
-  /** CodeMirror extension URIs. */
-  extensions: string[];
+  /** CodeMirror extensions. */
+  extensions: ExtensionData<any>[];
 
   /** Initial version number. */
   version: Version;
