@@ -125,7 +125,7 @@ If you're already in VS Code, right-click on the `codemirror-julia-0.0.0.vsix` f
 
 ![VS Code setting for Julia in CodeMirror](images/language-julia.png)
 
-And you're done! Now you'll get syntax highlighting if you execute **Open in CodeMirror** on a Julia file, and with no effect on non-Julia files.
+And you're done! Now you'll get syntax highlighting if you execute **Open in CodeMirror** on a Julia file, with no effect on non-Julia files.
 
 This is just a simple example, but you should be able to use the same pattern for pretty much any CodeMirror extension. If this doesn't work for your use case, feel free to open a [GitHub issue](https://github.com/samestep/codemirror-vscode/issues)!
 
