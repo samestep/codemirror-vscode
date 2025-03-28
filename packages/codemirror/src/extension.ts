@@ -147,7 +147,7 @@ export const activate = async (context: vscode.ExtensionContext) => {
     vscode.commands.registerCommand(
       "codemirror.extension.lang",
       async (cmCtx: CodeMirrorContext): Promise<ExtensionData<any>> => {
-        return lang(cmCtx) ?? { uri: getUri(cmCtx, "empty"), args: [] };
+        return (await lang(cmCtx)) ?? { uri: getUri(cmCtx, "empty"), args: [] };
       },
     ),
     vscode.commands.registerCommand("codemirror.open", () =>

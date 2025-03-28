@@ -26,7 +26,7 @@
     "configuration": {
       "properties": {
         "codemirror.extensions": {
-          "description": "VS Code commands to execute to get CodeMirror extensions.",
+          "markdownDescription": "VS Code commands to execute to get CodeMirror extensions.",
           "type": "array",
           "items": {
             "type": "string"
@@ -36,6 +36,13 @@
             "codemirror.extension.themeVscode",
             "codemirror.extension.lang"
           ]
+        },
+        "codemirror.languages": {
+          "markdownDescription": "VS Code command (**Value**) to execute from `codemirror.extension.lang` to get a CodeMirror extension for a given language identifier (**Item**).",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         },
         "codemirror.lang.html.autoCloseTags": {
           "type": "boolean",

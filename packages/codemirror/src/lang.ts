@@ -1,4 +1,5 @@
 import { CodeMirrorContext, ExtensionData } from "codemirror-vscode";
+import * as vscode from "vscode";
 
 // https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers
 // https://www.npmjs.com/org/codemirror
@@ -19,8 +20,16 @@ const known = new Set([
   "yaml",
 ]);
 
-export default (cmCtx: CodeMirrorContext): ExtensionData<any> | undefined => {
+export default async (
+  cmCtx: CodeMirrorContext,
+): Promise<ExtensionData<any> | undefined> => {
   const name = cmCtx.languageId;
+  const cfg =
+    vscode.workspace
+      .getConfiguration("codemirror")
+      .get<Record<string, string>>("languages") ?? {};
+  if (name in cfg)
+    return vscode.commands.executeCommand<ExtensionData<any>>(cfg[name], cmCtx);
   const uri = `@codemirror/lang-${name}`;
   if (known.has(name)) return { uri, name, args: [] };
   switch (name) {
