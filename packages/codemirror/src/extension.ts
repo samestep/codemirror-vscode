@@ -5,7 +5,7 @@ import * as path from "node:path";
 import * as vscode from "vscode";
 import lang from "./lang";
 import modules from "./modules.json";
-import { sync } from "./sync-extension";
+import { sync } from "./sync";
 import { Subscriber } from "./util";
 
 interface HtmlParams {

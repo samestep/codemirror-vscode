@@ -1,35 +1,98 @@
+import { Update } from "@codemirror/collab";
+import { ChangeSet } from "@codemirror/state";
 import { ExtensionData } from "codemirror-vscode";
-import { Replace } from "./text";
 
 /** A message ID, unique for a given sender but not across senders. */
 export type Id = number;
 
-/** A VS Code document version. */
-export type Version = number;
-
-/** A CodeMirror document version. */
-export type Patch = number;
-
 /** A request. */
-interface Req<T> {
+export interface Req<T> {
   kind: "request";
   id: Id;
   body: T;
 }
 
 /** A response. */
-interface Resp<T> {
+export interface Resp<T> {
   kind: "response";
   id: Id;
   body: T;
 }
 
+/** Message-passing wrapper using promises. */
+export class Connection<WeRequest, TheyRespond, TheyRequest, WeRespond> {
+  private postMessage: (message: Req<WeRequest> | Resp<WeRespond>) => void;
+  private id: number;
+  private pending: Map<Id, (response: TheyRespond) => void>;
+
+  /** Create a new connection. */
+  constructor({
+    postMessage,
+    setOnMessage,
+    respond,
+  }: {
+    postMessage: (message: Req<WeRequest> | Resp<WeRespond>) => void;
+    setOnMessage: (
+      listener: (message: Req<TheyRequest> | Resp<TheyRespond>) => void,
+    ) => void;
+    respond: (request: TheyRequest) => Promise<WeRespond>;
+  }) {
+    this.postMessage = postMessage;
+    this.id = 0;
+    this.pending = new Map();
+    setOnMessage(async (message) => {
+      switch (message.kind) {
+        case "request": {
+          const { id, body } = message;
+          const response = await respond(body);
+          postMessage({ kind: "response", id, body: response });
+          break;
+        }
+        case "response": {
+          const { id, body } = message;
+          const resolve = this.pending.get(id);
+          if (resolve === undefined) break;
+          this.pending.delete(id);
+          resolve(body);
+          break;
+        }
+      }
+    });
+  }
+
+  /** Send a request and wait for a response. */
+  request<T extends TheyRespond>(request: WeRequest): Promise<T> {
+    const id = this.id++;
+    this.postMessage({ kind: "request", id, body: request });
+    return new Promise((resolve) =>
+      this.pending.set(id, resolve as (response: TheyRespond) => void),
+    );
+  }
+}
+
+/** A VS Code document version. */
+export type Version = number;
+
+/** We cheat a bit by telling CodeMirror that both sides are the same client. */
+export const clientID = "";
+
+/** Serializable form of `Update` from `@codemirror/collab`. */
+export interface UpdateData {
+  /** Returned by `ChangeSet.toJSON`. */
+  changes: any;
+}
+
+/** Convert `Update` to `UpdateData`. */
+export const updatesToData = (updates: readonly Update[]): UpdateData[] =>
+  updates.map((u) => ({ changes: u.changes.toJSON() }));
+
+/** Convert `UpdateData` to `Update`. */
+export const dataToUpdates = (updates: UpdateData[]): readonly Update[] =>
+  updates.map((u) => ({ changes: ChangeSet.fromJSON(u.changes), clientID }));
+
 /** Webview to extension: send the initial configuration. */
 export interface StartRequest {
   kind: "start";
-
-  /** The patch number pre-allocated for the initial document version. */
-  patch: Patch;
 }
 
 /** Extension responding to webview: here is the initial configuration. */
@@ -44,62 +107,51 @@ export interface StartResponse {
   text: string;
 }
 
-/** Extension to webview: the VS Code document has a new version. */
-export interface VersionRequest {
-  kind: "version";
+/** Webview to extension: send a nonempty list of updates after a version. */
+export interface PullRequest {
+  kind: "pull";
 
-  /** Previous version to which the diff applies. */
-  previous: Version;
+  /** Only send updates after this version.. */
+  version: Version;
+}
 
-  /** New version number. */
+/** Extension responding to webview: here are the updates. */
+export interface PullResponse {
+  updates: UpdateData[];
+}
+
+/** Webview to extension: please apply these updates on top of a version. */
+export interface PushRequest {
+  kind: "push";
+
+  /** Version to which the updates apply. */
   version: Version;
 
-  /** Patch to which this new version is exactly equal, if any is known. */
-  patch?: Patch;
-
-  /** Changes to apply to the previous version to get this one. */
-  diff: Replace[];
+  /** The updates. */
+  updates: UpdateData[];
 }
 
-/** Webview responding to extension: new VS Code doc version acknowledged. */
-export interface VersionResponse {
-  /** Patch number assigned to be equivalent to this version number. */
-  patch: Patch;
+/** Extension responding to webview: push processed. */
+export interface PushResponse {
+  accepted: boolean;
 }
-
-/** Webview to extension: apply this patch on top of a prior patch. */
-export interface PatchRequest {
-  kind: "patch";
-
-  /** Prior patch version to which the diff applies. */
-  prior: Patch;
-
-  /** New patch number. */
-  patch: Patch;
-
-  /** Changes to apply to the prior patch to get this one. */
-  diff: Replace[];
-}
-
-/** Extension responding to webview: patch acknowledged. */
-export interface PatchResponse {}
 
 /** Body of a request from webview to extension. */
-export type WebviewRequest = StartRequest | PatchRequest;
+export type WebviewRequests = StartRequest | PullRequest | PushRequest;
 
-/** Body of a response from webview to extension. */
-export type ExtensionResponse = StartResponse | PatchResponse;
+/** Body of a response from extension to webview. */
+export type ExtensionResponds = StartResponse | PullResponse | PushResponse;
 
 /** Body of a request from extension to webview. */
-export type ExtensionRequest = VersionRequest;
+export type ExtensionRequests = never;
 
 /** Body of a response from webview to extension. */
-export type WebviewResponse = VersionResponse;
+export type WebviewResponds = never;
 
 /** A message from extension to webview. */
 export type ExtensionToWebview =
-  | Req<ExtensionRequest>
-  | Resp<ExtensionResponse>;
+  | Req<ExtensionRequests>
+  | Resp<ExtensionResponds>;
 
 /** A message from webview to extension. */
-export type WebviewToExtension = Req<WebviewRequest> | Resp<WebviewResponse>;
+export type WebviewToExtension = Req<WebviewRequests> | Resp<WebviewResponds>;
