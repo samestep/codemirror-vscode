@@ -24,7 +24,7 @@ This project packages CodeMirror as a [webview](https://code.visualstudio.com/ap
 
 This extension is not yet published to the VS Code Marketplace; check back later, or if you're curious then you can refer to [`CONTRIBUTING.md`](CONTRIBUTING.md) to build it from source.
 
-Use the **Open in CodeMirror** command to open the current file in a new CodeMirror editor. To configure CodeMirror, add or remove items from the **`codemirror.extensions`** and **`codemirror.languages`** VS Code settings:
+Use the **Open in CodeMirror** command (bound to `ctrl+alt+c ctrl+alt+m` by default) to open the current file in a new CodeMirror editor. To configure CodeMirror, add or remove items from the **`codemirror.extensions`** and **`codemirror.languages`** VS Code settings:
 
 ![VS Code settings for languages and CodeMirror extensions](images/settings.png)
 

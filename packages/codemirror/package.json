@@ -23,6 +23,12 @@
         "title": "Open in CodeMirror"
       }
     ],
+    "keybindings": [
+      {
+        "command": "codemirror.open",
+        "key": "ctrl+alt+c ctrl+alt+m"
+      }
+    ],
     "configuration": {
       "properties": {
         "codemirror.extensions": {
