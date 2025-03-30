@@ -99,13 +99,15 @@ const sync = (startVersion: number): Extension => [
 ];
 
 connection.request<StartResponse>({ kind: "start" }).then(async (start) => {
+  const { extensions, version, text, selection } = start;
   new EditorView({
     state: EditorState.create({
-      doc: start.text,
+      doc: text,
+      selection,
       extensions: [
-        sync(start.version),
+        sync(version),
         await Promise.all(
-          start.extensions.map(async ({ uri, name, args }) => {
+          extensions.map(async ({ uri, name, args }) => {
             const mod = await import(uri);
             const func: (...args: any) => Extension | Promise<Extension> =
               name === undefined ? mod.default : mod[name];
@@ -115,5 +117,6 @@ connection.request<StartResponse>({ kind: "start" }).then(async (start) => {
       ],
     }),
     parent: document.body,
-  });
+    scrollTo: EditorView.scrollIntoView(selection.head, { y: "center" }),
+  }).focus();
 });

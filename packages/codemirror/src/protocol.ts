@@ -73,6 +73,15 @@ export class Connection<WeRequest, TheyRespond, TheyRequest, WeRespond> {
 /** A VS Code document version. */
 export type Version = number;
 
+/** Offsets of a selection in a document. */
+export interface Selection {
+  /** Cursor position. */
+  head: number;
+
+  /** Other end of the selection. */
+  anchor: number;
+}
+
 /** We cheat a bit by telling CodeMirror that both sides are the same client. */
 export const clientID = "";
 
@@ -105,6 +114,9 @@ export interface StartResponse {
 
   /** Initial document text. */
   text: string;
+
+  /** Initial selection. */
+  selection: Selection;
 }
 
 /** Webview to extension: send a nonempty list of updates after a version. */

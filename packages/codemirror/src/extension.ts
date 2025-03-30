@@ -18,12 +18,12 @@ const open = async (
   log: vscode.LogOutputChannel,
   template: Handlebars.TemplateDelegate<HtmlParams>,
 ) => {
-  const active = vscode.window.activeTextEditor;
-  if (active === undefined) {
+  const editor = vscode.window.activeTextEditor;
+  if (editor === undefined) {
     vscode.window.showErrorMessage("no active editor to open in CodeMirror");
     return;
   }
-  const { document } = active;
+  const { document } = editor;
   const sub = new Subscriber(log, document.uri.toString());
 
   sub.scribe(vscode.workspace.onDidCloseTextDocument, (doc) => {
@@ -64,7 +64,7 @@ const open = async (
       vscode.commands.executeCommand<ExtensionData<any>>(command, cmCtx),
     ),
   );
-  sync({ log, extensions, document, sub, webview });
+  sync({ log, editor, sub, webview, extensions });
 
   const importmap = {
     imports: Object.fromEntries(

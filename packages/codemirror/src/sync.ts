@@ -51,17 +51,19 @@ const vscodeToCodemirror = (
 // https://github.com/codemirror/website/blob/b7247cacfcd389e359a038a41fff679185538ef8/site/examples/collab/worker.ts
 export const sync = ({
   log,
-  extensions,
-  document,
+  editor,
   sub,
   webview,
+  extensions,
 }: {
   log: vscode.LogOutputChannel;
-  extensions: ExtensionData<any>[];
-  document: vscode.TextDocument;
+  editor: vscode.TextEditor;
   sub: Subscriber;
   webview: vscode.Webview;
+  extensions: ExtensionData<any>[];
 }) => {
+  const { document } = editor;
+
   const updates: Update[] = new Array(document.version);
   let doc = Text.of(document.getText().split(DefaultSplit));
   const pending: ((updates: UpdateData[]) => void)[] = [];
@@ -101,6 +103,10 @@ export const sync = ({
             extensions,
             version: document.version,
             text: document.getText(),
+            selection: {
+              head: document.offsetAt(editor.selection.active),
+              anchor: document.offsetAt(editor.selection.anchor),
+            },
           };
           return response;
         }
