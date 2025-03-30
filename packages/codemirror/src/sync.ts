@@ -27,19 +27,10 @@ const codemirrorToVscode = (
 ): vscode.WorkspaceEdit => {
   const edit = new vscode.WorkspaceEdit();
   update.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
-    // Two different representations: CodeMirror lists changes from left to
-    // right, whereas VS Code applies edits in order. So, for each change, we
-    // want to tell VS Code the range right before that change is applied.
-    // Because we're going from left to right, the start of that range is just
-    // the same as after all edits are applied. Then we can compute the end of
-    // the range by adding the length of the text that was replaced.
-    const start = document.positionAt(fromB);
-    const end = document.positionAt(fromB + (toA - fromA));
-    edit.replace(
-      document.uri,
-      new vscode.Range(start, end),
-      inserted.toString(),
-    );
+    const start = document.positionAt(fromA);
+    const end = document.positionAt(toA);
+    const range = new vscode.Range(start, end);
+    edit.replace(document.uri, range, inserted.toString());
   });
   return edit;
 };
