@@ -3,7 +3,7 @@
 *.vsix
 /.direnv/
 /.envrc
-/packages/codemirror/logo.*
+/packages/codemirror/icon.png
 /packages/codemirror/README.md
 dist/
 node_modules/

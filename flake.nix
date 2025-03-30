@@ -21,7 +21,6 @@
             buildInputs = [
               nixfmt-rfc-style
               nodejs
-              wget
             ];
           };
       }

@@ -1,6 +1,6 @@
 # Contributing
 
-Have Node.js and Wget installed, or just use Nix. Run these commands to build:
+If you have Node.js installed, just run these commands to typecheck and build:
 
 ```sh
 npm install

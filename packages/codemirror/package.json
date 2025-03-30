@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "displayName": "CodeMirror",
   "description": "CodeMirror as a VS Code extension.",
-  "icon": "logo.png",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -91,10 +91,9 @@
   "scripts": {
     "check": "tsc",
     "readme": "cp ../../README.md .",
-    "svg": "wget --no-clobber https://raw.githubusercontent.com/codemirror/website/b7247cacfcd389e359a038a41fff679185538ef8/site/style/logo.svg",
-    "png": "resvg-js logo.svg logo.png",
+    "icon": "resvg-js ../../node_modules/codemirror-website/site/style/logo.svg icon.png",
     "dist": "rm -rf dist && node build.mjs",
     "vsix": "vsce package",
-    "build": "npm run readme && npm run svg && npm run png && npm run dist && npm run vsix"
+    "build": "npm run readme && npm run icon && npm run dist && npm run vsix"
   }
 }
