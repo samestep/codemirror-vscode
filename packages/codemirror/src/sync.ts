@@ -23,13 +23,10 @@ const DefaultSplit = /\r\n?|\n/;
 
 const codemirrorToVscode = (
   document: vscode.TextDocument,
-  text: Text,
-  updates: readonly Update[],
+  update: Update,
 ): vscode.WorkspaceEdit => {
-  let changes = ChangeSet.empty(text.length);
-  for (const update of updates) changes = changes.compose(update.changes);
   const edit = new vscode.WorkspaceEdit();
-  changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
+  update.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
     // Two different representations: CodeMirror lists changes from left to
     // right, whereas VS Code applies edits in order. So, for each change, we
     // want to tell VS Code the range right before that change is applied.
@@ -136,8 +133,14 @@ export const sync = ({
           let received = dataToUpdates(request.updates);
           if (request.version !== updates.length)
             received = rebaseUpdates(received, updates.slice(request.version));
-          const edit = codemirrorToVscode(document, doc, received);
-          const accepted = await vscode.workspace.applyEdit(edit);
+          let accepted = true;
+          for (let update of received) {
+            const edit = codemirrorToVscode(document, update);
+            if (!(await vscode.workspace.applyEdit(edit))) {
+              accepted = false;
+              break;
+            }
+          }
           const response: PushResponse = { accepted };
           return response;
         }
