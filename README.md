@@ -34,6 +34,8 @@ Here is a list of the CodeMirror extensions included in this VS Code extension:
 
 - **`codemirror.extension.minimalSetup`** is the `minimalSetup` extension from that same `codemirror` npm package, which is a "minimal set of extensions to create a functional editor."
 
+- **`codemirror.extension.wordWrap`** is the CodeMirror [`EditorView.lineWrapping`](https://codemirror.net/docs/ref/#view.EditorView^lineWrapping) extension, gated by the VS Code [`editor.wordWrap`](https://code.visualstudio.com/docs/editing/codebasics#_how-do-i-turn-on-word-wrap) setting.
+
 - **`codemirror.extension.themeVscode`** uses the VS Code [color theme kind](https://code.visualstudio.com/api/references/vscode-api#ColorThemeKind) to select between the dark and light themes provided by the [`@uiw/codemirror-theme-vscode`](https://www.npmjs.com/package/@uiw/codemirror-theme-vscode/v/4.23.10) npm package.
 
 - **`codemirror.extension.vscodeDark`** applies the VS Code dark theme from the `@uiw/codemirror-theme-vscode` npm package.

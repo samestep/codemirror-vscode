@@ -39,6 +39,7 @@
           },
           "default": [
             "codemirror.extension.basicSetup",
+            "codemirror.extension.wordWrap",
             "codemirror.extension.themeVscode",
             "codemirror.extension.lang"
           ]

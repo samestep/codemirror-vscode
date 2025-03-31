@@ -52,7 +52,7 @@ const open = async (
 
   const cmCtx: CodeMirrorContext = {
     asWebviewUri: (uri) => webview.asWebviewUri(uri),
-    languageId: document.languageId,
+    editor,
   };
   log.trace("CodeMirror context:", cmCtx);
   const extensions = await Promise.all(
@@ -118,6 +118,16 @@ export const activate = async (context: vscode.ExtensionContext) => {
       "codemirror.extension.minimalSetup",
       async (cmCtx: CodeMirrorContext): Promise<ExtensionData<[]>> => {
         return { uri: getUri(cmCtx, "basic-setup"), name: "minimal", args: [] };
+      },
+    ),
+    vscode.commands.registerCommand(
+      "codemirror.extension.wordWrap",
+      async (cmCtx: CodeMirrorContext): Promise<ExtensionData<any>> => {
+        const wordWrap = vscode.workspace
+          .getConfiguration("editor", cmCtx.editor.document)
+          .get<"on" | "off">("wordWrap");
+        const uri = getUri(cmCtx, wordWrap === "on" ? "word-wrap" : "empty");
+        return { uri, args: [] };
       },
     ),
     vscode.commands.registerCommand(

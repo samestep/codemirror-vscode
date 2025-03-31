@@ -23,7 +23,7 @@ const known = new Set([
 export default async (
   cmCtx: CodeMirrorContext,
 ): Promise<ExtensionData<any> | undefined> => {
-  const name = cmCtx.languageId;
+  const name = cmCtx.editor.document.languageId;
   const cfg =
     vscode.workspace
       .getConfiguration("codemirror")
