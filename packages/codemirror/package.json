@@ -91,10 +91,11 @@
   },
   "scripts": {
     "check": "tsc",
+    "license": "cp ../../LICENSE .",
     "readme": "cp ../../README.md .",
     "icon": "resvg-js ../../node_modules/codemirror-website/site/style/logo.svg icon.png",
     "dist": "rm -rf dist && node build.mjs",
     "vsix": "vsce package",
-    "build": "npm run readme && npm run icon && npm run dist && npm run vsix"
+    "build": "npm run license && npm run readme && npm run icon && npm run dist && npm run vsix"
   }
 }

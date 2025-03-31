@@ -3,7 +3,9 @@
 *.vsix
 /.direnv/
 /.envrc
+/packages/codemirror-interact/LICENSE
 /packages/codemirror/icon.png
+/packages/codemirror/LICENSE
 /packages/codemirror/README.md
 dist/
 node_modules/
