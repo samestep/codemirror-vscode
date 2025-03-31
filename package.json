@@ -66,11 +66,15 @@
     "codemirror-website": "codemirror/website",
     "esbuild": "^0.25",
     "handlebars": "^4",
+    "prettier": "^3",
     "prettier-plugin-organize-imports": "^4",
     "typescript": "^5"
   },
   "scripts": {
-    "check": "tsc"
+    "prettier-check": "prettier --check .",
+    "prettier-write": "prettier --write .",
+    "typescript": "tsc",
+    "check": "npm run prettier-check && npm run typescript"
   },
   "prettier": {
     "plugins": [
