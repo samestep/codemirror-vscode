@@ -44,7 +44,7 @@
         },
         "codemirrorColorPicker.layout": {
           "order": 1,
-          "markdownDescription": "Components in the layout. Note that the alpha slider has no effect for colors that do not have an alpha channel.",
+          "markdownDescription": "Components in the layout.\n\n- Wheels allow the user to adjust the color's **hue** and **saturation**.\n- Boxes allow the user to adjust the color's **saturation** and **value**.\n- Sliders allow the user to adjust a specific color channel.",
           "type": "array",
           "items": {
             "type": "string",

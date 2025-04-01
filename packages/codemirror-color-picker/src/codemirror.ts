@@ -15,15 +15,15 @@ type Format = "hex" | "hex8" | "rgb" | "rgba" | "hsl" | "hsla";
 const colorString = (format: Format, color: iro.Color): string => {
   switch (format) {
     case "hex":
-      return color.hexString;
+      return color.alpha < 1 ? color.hex8String : color.hexString;
     case "hex8":
       return color.hex8String;
     case "rgb":
-      return color.rgbString;
+      return color.alpha < 1 ? color.rgbaString : color.rgbString;
     case "rgba":
       return color.rgbaString;
     case "hsl":
-      return color.hslString;
+      return color.alpha < 1 ? color.hslaString : color.hslString;
     case "hsla":
       return color.hslaString;
   }
