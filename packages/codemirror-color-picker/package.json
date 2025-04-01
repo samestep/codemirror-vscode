@@ -1,0 +1,167 @@
+{
+  "private": true,
+  "publisher": "samestep",
+  "name": "codemirror-color-picker",
+  "version": "0.1.0",
+  "displayName": "CodeMirror Color Picker",
+  "description": "A color picker extension for CodeMirror.",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samestep/codemirror-vscode",
+    "directory": "packages/codemirror-color-picker"
+  },
+  "extensionDependencies": [
+    "samestep.codemirror"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onCommand:codemirrorColorPicker.extension"
+  ],
+  "contributes": {
+    "configuration": {
+      "properties": {
+        "codemirrorColorPicker.backgroundColor": {
+          "order": -2,
+          "markdownDescription": "Color of the background. Any valid CSS color is supported.",
+          "type": "string",
+          "default": "rgba(0, 0, 0, 0.5)"
+        },
+        "codemirrorColorPicker.borderRadius": {
+          "order": -1,
+          "markdownDescription": "Radius of the background border, measured in pixels.",
+          "type": "integer",
+          "default": 16
+        },
+        "codemirrorColorPicker.width": {
+          "order": 0,
+          "markdownDescription": "The total width of the color picker UI, measured in pixels.",
+          "type": "integer",
+          "default": 200
+        },
+        "codemirrorColorPicker.layout": {
+          "order": 1,
+          "markdownDescription": "Components in the layout. Note that the alpha slider has no effect for colors that do not have an alpha channel.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "wheel",
+              "box",
+              "hue slider",
+              "saturation slider",
+              "value slider",
+              "red slider",
+              "green slider",
+              "blue slider",
+              "alpha slider",
+              "kelvin temperature slider"
+            ]
+          },
+          "default": [
+            "wheel",
+            "value slider",
+            "alpha slider"
+          ]
+        },
+        "codemirrorColorPicker.layoutDirection": {
+          "order": 2,
+          "markdownDescription": "Component stacking direction.",
+          "type": "string",
+          "enum": [
+            "vertical",
+            "horizontal"
+          ],
+          "default": "horizontal"
+        },
+        "codemirrorColorPicker.borderWidth": {
+          "order": 3,
+          "markdownDescription": "Width of the border around the controls, measured in pixels.",
+          "type": "integer",
+          "default": 2
+        },
+        "codemirrorColorPicker.borderColor": {
+          "order": 4,
+          "markdownDescription": "Color of the border. Any valid CSS color is supported.",
+          "type": "string",
+          "default": "#ffffff"
+        },
+        "codemirrorColorPicker.padding": {
+          "order": 5,
+          "markdownDescription": "Padding between control handles and the edges of a component.",
+          "type": "integer",
+          "default": 6
+        },
+        "codemirrorColorPicker.margin": {
+          "order": 6,
+          "markdownDescription": "Gap between individual components.",
+          "type": "integer",
+          "default": 12
+        },
+        "codemirrorColorPicker.handleRadius": {
+          "order": 7,
+          "markdownDescription": "Radius of the control handles, measured in pixels.",
+          "type": "integer",
+          "default": 8
+        },
+        "codemirrorColorPicker.activeHandleRadius": {
+          "order": 8,
+          "markdownDescription": "Overrides handle radius for the handle of the currently selected color. Inherits handle radius value by default.",
+          "type": [
+            "null",
+            "integer"
+          ]
+        },
+        "codemirrorColorPicker.wheelLightness": {
+          "order": 9,
+          "markdownDescription": "If set to false, the color wheel will not fade to black when the lightness decreases.",
+          "type": "boolean",
+          "default": true
+        },
+        "codemirrorColorPicker.wheelAngle": {
+          "order": 10,
+          "markdownDescription": "Starting angle of the color wheel's hue gradient, measured in degrees.",
+          "type": "integer",
+          "default": 0
+        },
+        "codemirrorColorPicker.wheelDirection": {
+          "order": 11,
+          "markdownDescription": "Direction of the color wheel's hue gradient.",
+          "type": "string",
+          "enum": [
+            "clockwise",
+            "anticlockwise"
+          ],
+          "default": "anticlockwise"
+        },
+        "codemirrorColorPicker.sliderSize": {
+          "order": 12,
+          "markdownDescription": "Slider size, measured in pixels. By default this will be calculated automatically from padding and handle radius.",
+          "type": [
+            "null",
+            "integer"
+          ]
+        },
+        "codemirrorColorPicker.boxHeight": {
+          "order": 13,
+          "markdownDescription": "Box control height, measured in pixels. By default this will be the same value as the total width.",
+          "type": [
+            "null",
+            "integer"
+          ]
+        }
+      }
+    }
+  },
+  "scripts": {
+    "check": "tsc",
+    "license": "cp ../../LICENSE .",
+    "esm": "esbuild src/codemirror.ts --bundle --format=esm --external:@codemirror --external:@lezer --outdir=dist",
+    "cjs": "esbuild src/extension.ts --bundle --format=cjs --platform=node --external:vscode --outdir=dist",
+    "vsix": "vsce package",
+    "build": "npm run license && npm run esm && npm run cjs && npm run vsix"
+  }
+}

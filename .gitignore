@@ -3,6 +3,7 @@
 *.vsix
 /.direnv/
 /.envrc
+/packages/codemirror-color-picker/LICENSE
 /packages/codemirror-interact/LICENSE
 /packages/codemirror/icon.png
 /packages/codemirror/LICENSE
