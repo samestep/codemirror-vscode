@@ -80,7 +80,7 @@ export const sync = ({
     while (pending.length > 0) pending.pop()!(data);
   });
 
-  const connection = new Connection<
+  new Connection<
     ExtensionRequests,
     WebviewResponds,
     WebviewRequests,
