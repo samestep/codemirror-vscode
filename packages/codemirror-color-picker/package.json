@@ -19,6 +19,7 @@
   ],
   "main": "./dist/extension.js",
   "activationEvents": [
+    "onCommand:codemirror.open",
     "onCommand:codemirrorColorPicker.extension"
   ],
   "contributes": {

@@ -41,7 +41,8 @@
             "codemirror.extension.basicSetup",
             "codemirror.extension.wordWrap",
             "codemirror.extension.themeVscode",
-            "codemirror.extension.lang"
+            "codemirror.extension.lang",
+            "codemirror.extension.auto"
           ]
         },
         "codemirror.languages": {

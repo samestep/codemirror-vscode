@@ -1,10 +1,12 @@
 import { CodeMirrorContext, ExtensionData } from "codemirror-vscode";
 import * as vscode from "vscode";
 
-export const activate = (context: vscode.ExtensionContext) => {
+export const activate = async (context: vscode.ExtensionContext) => {
+  const command = "codemirrorInteract.extension";
   context.subscriptions.push(
+    await vscode.commands.executeCommand("codemirror.register", command),
     vscode.commands.registerCommand(
-      "codemirrorInteract.extension",
+      command,
       async (cmCtx: CodeMirrorContext): Promise<ExtensionData<[]>> => ({
         uri: cmCtx
           .asWebviewUri(

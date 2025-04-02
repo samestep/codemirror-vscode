@@ -56,7 +56,7 @@ const open = async (
     asWebviewUri: (uri) => webview.asWebviewUri(uri),
     editor,
   };
-  log.trace("CodeMirror context:", cmCtx);
+  log.debug("CodeMirror context:", cmCtx);
   const extensions = await Promise.all(
     (
       vscode.workspace
@@ -87,7 +87,7 @@ const open = async (
     vscode.Uri.joinPath(context.extensionUri, "dist", "webview.js"),
   );
   const html = template(JSON.stringify(importmap), script.toString());
-  log.trace("HTML:", html);
+  log.debug("HTML:", html);
   webview.html = html;
 };
 
@@ -100,6 +100,8 @@ export const activate = (context: vscode.ExtensionContext) => {
     const uri = vscode.Uri.joinPath(base, "dist", "extensions", `${name}.js`);
     return cmCtx.asWebviewUri(uri).toString();
   };
+
+  const registry = new Map<string, number>();
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
@@ -152,6 +154,50 @@ export const activate = (context: vscode.ExtensionContext) => {
       "codemirror.extension.lang",
       async (cmCtx: CodeMirrorContext): Promise<ExtensionData<any>> => {
         return (await lang(cmCtx)) ?? { uri: getUri(cmCtx, "empty"), args: [] };
+      },
+    ),
+    vscode.commands.registerCommand(
+      "codemirror.extension.auto",
+      async (
+        cmCtx: CodeMirrorContext,
+      ): Promise<ExtensionData<ExtensionData<any>[]>> => {
+        const groups = new Map<number, string[]>();
+        for (const [command, order] of registry.entries()) {
+          if (!groups.has(order)) groups.set(order, []);
+          groups.get(order)!.push(command);
+        }
+        const sorted = [...groups.entries()].sort(([a], [b]) => a - b);
+        log.debug("registry:", sorted);
+        const commands: string[] = [];
+        for (const [, group] of sorted) {
+          group.sort();
+          commands.push(...group);
+        }
+        log.debug("commands:", commands);
+        const args = await Promise.all(
+          commands.map((command) =>
+            vscode.commands.executeCommand<ExtensionData<any>>(command, cmCtx),
+          ),
+        );
+        return { uri: getUri(cmCtx, "multiple"), args };
+      },
+    ),
+    vscode.commands.registerCommand(
+      "codemirror.register",
+      (command: string, order?: number): vscode.Disposable => {
+        log.debug("registering command:", command);
+        if (typeof command !== "string")
+          throw Error("command must be a string");
+        if (!(order === undefined || Number.isFinite(order)))
+          throw Error("command order must be a finite number");
+        if (registry.has(command)) throw Error("command already registered");
+        registry.set(command, order ?? 0);
+        return vscode.Disposable.from({
+          dispose: () => {
+            log.debug("unregistering command:", command);
+            registry.delete(command);
+          },
+        });
       },
     ),
     vscode.commands.registerCommand("codemirror.open", () =>

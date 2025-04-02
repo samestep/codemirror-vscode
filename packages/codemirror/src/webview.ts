@@ -7,6 +7,7 @@ import {
 } from "@codemirror/collab";
 import { EditorState, Extension } from "@codemirror/state";
 import { EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
+import multiple from "./extensions/multiple";
 import {
   clientID,
   Connection,
@@ -104,17 +105,7 @@ connection.request<StartResponse>({ kind: "start" }).then(async (start) => {
     state: EditorState.create({
       doc: text,
       selection,
-      extensions: [
-        sync(version),
-        await Promise.all(
-          extensions.map(async ({ uri, name, args }) => {
-            const mod = await import(uri);
-            const func: (...args: any) => Extension | Promise<Extension> =
-              name === undefined ? mod.default : mod[name];
-            return func(...args);
-          }),
-        ),
-      ],
+      extensions: [sync(version), await multiple(...extensions)],
     }),
     parent: document.body,
     scrollTo: EditorView.scrollIntoView(selection.head, { y: "center" }),
