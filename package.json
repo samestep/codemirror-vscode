@@ -68,7 +68,6 @@
     "@vscode/vsce": "^3",
     "codemirror-website": "codemirror/website",
     "esbuild": "^0.25",
-    "handlebars": "^4",
     "prettier": "^3",
     "prettier-plugin-organize-imports": "^4",
     "typescript": "^5"

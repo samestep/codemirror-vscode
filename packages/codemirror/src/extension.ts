@@ -1,6 +1,4 @@
 import { CodeMirrorContext, ExtensionData } from "codemirror-vscode";
-import Handlebars from "handlebars";
-import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import * as vscode from "vscode";
 import lang from "./lang";
@@ -8,15 +6,19 @@ import modules from "./modules.json";
 import { sync } from "./sync";
 import { Subscriber } from "./util";
 
-interface HtmlParams {
-  importmap: string;
-  script: string;
-}
+const template = (importmap: string, script: string) => `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="importmap">${importmap}</script>
+    <script type="module" src="${script}"></script>
+  </head>
+</html>`;
 
 const open = async (
   context: vscode.ExtensionContext,
   log: vscode.LogOutputChannel,
-  template: Handlebars.TemplateDelegate<HtmlParams>,
 ) => {
   const editor = vscode.window.activeTextEditor;
   if (editor === undefined) {
@@ -81,25 +83,17 @@ const open = async (
       ),
     ),
   };
-  log.trace("import map:", importmap);
-  const script = webview
-    .asWebviewUri(
+  const script = webview.asWebviewUri(
       vscode.Uri.joinPath(context.extensionUri, "dist", "webview.js"),
-    )
-    .toString();
-  log.trace("script as webview URI:", script);
-  webview.html = template({ importmap: JSON.stringify(importmap), script });
+  );
+  const html = template(JSON.stringify(importmap), script.toString());
+  log.trace("HTML:", html);
+  webview.html = html;
 };
 
-export const activate = async (context: vscode.ExtensionContext) => {
+export const activate = (context: vscode.ExtensionContext) => {
   const log = vscode.window.createOutputChannel("CodeMirror", { log: true });
   log.info("activating CodeMirror extension");
-
-  const templatePath = path.join(context.extensionPath, "src", "webview.hbs");
-  log.debug("located HTML template:", templatePath);
-  const templateText = await fs.readFile(templatePath, "utf8");
-  log.trace("read HTML template:\n", templateText);
-  const template = Handlebars.compile<HtmlParams>(templateText);
 
   const getUri = (cmCtx: CodeMirrorContext, name: string): string => {
     const base = context.extensionUri;
@@ -161,7 +155,7 @@ export const activate = async (context: vscode.ExtensionContext) => {
       },
     ),
     vscode.commands.registerCommand("codemirror.open", () =>
-      open(context, log, template),
+      open(context, log),
     ),
   );
 };
