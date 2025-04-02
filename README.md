@@ -93,6 +93,7 @@ Next, put metadata and build scripts in `package.json`:
   "main": "./dist/extension.js",
   "activationEvents": [
     "onCommand:codemirror.open",
+    "onCommand:codemirror.openWordWrap",
     "onCommand:codemirrorIndentationMarkers.extension"
   ],
   "devDependencies": {
