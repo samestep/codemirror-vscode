@@ -21,12 +21,22 @@
       {
         "command": "codemirror.open",
         "title": "Open in CodeMirror"
+      },
+      {
+        "command": "codemirror.openWordWrap",
+        "title": "Open in CodeMirror with word wrap"
       }
     ],
     "keybindings": [
       {
+        "key": "ctrl+alt+c ctrl+alt+m",
         "command": "codemirror.open",
-        "key": "ctrl+alt+c ctrl+alt+m"
+        "when": "!editorWordWrap"
+      },
+      {
+        "key": "ctrl+alt+c ctrl+alt+m",
+        "command": "codemirror.openWordWrap",
+        "when": "editorWordWrap"
       }
     ],
     "configuration": {

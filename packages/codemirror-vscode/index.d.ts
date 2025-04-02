@@ -5,8 +5,11 @@ export interface CodeMirrorContext {
   /** Convert a `file:` URI to a webview URI. */
   asWebviewUri: (uri: vscode.Uri) => vscode.Uri;
 
-  /** VS Code editor. */
-  editor: vscode.TextEditor;
+  /** VS Code language ID of the document. */
+  languageId: string;
+
+  /** Whether word wrap is enabled for the document. */
+  wordWrap: boolean;
 }
 
 /** Data returned from a VS Code command for a CodeMirror extension. */

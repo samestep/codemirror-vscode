@@ -19,6 +19,7 @@ const template = (importmap: string, script: string) => `<!DOCTYPE html>
 const open = async (
   context: vscode.ExtensionContext,
   log: vscode.LogOutputChannel,
+  options: { wordWrap: boolean },
 ) => {
   const editor = vscode.window.activeTextEditor;
   if (editor === undefined) {
@@ -54,8 +55,10 @@ const open = async (
 
   const cmCtx: CodeMirrorContext = {
     asWebviewUri: (uri) => webview.asWebviewUri(uri),
-    editor,
+    languageId: document.languageId,
+    wordWrap: options.wordWrap,
   };
+  Object.freeze(cmCtx);
   log.debug("CodeMirror context:", cmCtx);
   const extensions = await Promise.all(
     (
@@ -125,10 +128,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     vscode.commands.registerCommand(
       "codemirror.extension.wordWrap",
       async (cmCtx: CodeMirrorContext): Promise<ExtensionData<any>> => {
-        const wordWrap = vscode.workspace
-          .getConfiguration("editor", cmCtx.editor.document)
-          .get<"on" | "off">("wordWrap");
-        const uri = getUri(cmCtx, wordWrap === "on" ? "word-wrap" : "empty");
+        const uri = getUri(cmCtx, cmCtx.wordWrap ? "word-wrap" : "empty");
         return { uri, args: [] };
       },
     ),
@@ -207,7 +207,10 @@ export const activate = (context: vscode.ExtensionContext) => {
       },
     ),
     vscode.commands.registerCommand("codemirror.open", () =>
-      open(context, log),
+      open(context, log, { wordWrap: false }),
+    ),
+    vscode.commands.registerCommand("codemirror.openWordWrap", () =>
+      open(context, log, { wordWrap: true }),
     ),
   );
 };
