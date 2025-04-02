@@ -209,6 +209,12 @@ export const activate = (context: vscode.ExtensionContext) => {
     vscode.commands.registerCommand("codemirror.open", () =>
       open(context, log, { wordWrap: false }),
     ),
+    // Ideally, `codemirror.openWordWrap` would call `codemirror.open` instead
+    // of just calling the `open` function directly, so that extensions
+    // depending on this one could just list `onCommand:codemirror.open` in
+    // their `activationEvents` instead of also having to list
+    // `onCommand:codemirror.openWordWrap`. Unfortunately, for some reason that
+    // doesn't work.
     vscode.commands.registerCommand("codemirror.openWordWrap", () =>
       open(context, log, { wordWrap: true }),
     ),
