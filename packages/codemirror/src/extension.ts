@@ -16,11 +16,15 @@ const template = (importmap: string, script: string) => `<!DOCTYPE html>
   </head>
 </html>`;
 
+interface Options {
+  wordWrap?: boolean;
+}
+
 const open = async (
   context: vscode.ExtensionContext,
   log: vscode.LogOutputChannel,
-  options: { wordWrap: boolean },
-) => {
+  options?: Options,
+): Promise<void> => {
   const editor = vscode.window.activeTextEditor;
   if (editor === undefined) {
     vscode.window.showErrorMessage("no active editor to open in CodeMirror");
@@ -56,7 +60,7 @@ const open = async (
   const cmCtx: CodeMirrorContext = {
     asWebviewUri: (uri) => webview.asWebviewUri(uri),
     languageId: document.languageId,
-    wordWrap: options.wordWrap,
+    wordWrap: options?.wordWrap ?? false,
   };
   Object.freeze(cmCtx);
   log.debug("CodeMirror context:", cmCtx);
@@ -190,7 +194,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     ),
     vscode.commands.registerCommand(
       "codemirror.register",
-      (command: string, order?: number): vscode.Disposable => {
+      async (command: string, order?: number): Promise<vscode.Disposable> => {
         log.debug("registering command:", command);
         if (typeof command !== "string")
           throw Error("command must be a string");
@@ -206,11 +210,18 @@ export const activate = (context: vscode.ExtensionContext) => {
         });
       },
     ),
-    vscode.commands.registerCommand("codemirror.open", () =>
-      open(context, log, { wordWrap: false }),
+    vscode.commands.registerCommand(
+      "codemirror.open",
+      async (options?: Options): Promise<void> => {
+        await open(context, log, options);
+      },
     ),
-    vscode.commands.registerCommand("codemirror.openWordWrap", () =>
-      open(context, log, { wordWrap: true }),
+    vscode.commands.registerCommand(
+      "codemirror.openWordWrap",
+      async (): Promise<void> => {
+        const options: Options = { wordWrap: true };
+        await vscode.commands.executeCommand("codemirror.open", options);
+      },
     ),
   );
 };
