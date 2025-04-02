@@ -84,7 +84,7 @@ const open = async (
     ),
   };
   const script = webview.asWebviewUri(
-      vscode.Uri.joinPath(context.extensionUri, "dist", "webview.js"),
+    vscode.Uri.joinPath(context.extensionUri, "dist", "webview.js"),
   );
   const html = template(JSON.stringify(importmap), script.toString());
   log.trace("HTML:", html);
