@@ -104,6 +104,12 @@ export const activate = (context: vscode.ExtensionContext) => {
   const registry = new Map<string, number>();
 
   context.subscriptions.push(
+    vscode.Disposable.from({
+      dispose: () => {
+        log.debug("unregistering all commands");
+        registry.clear();
+      },
+    }),
     vscode.commands.registerCommand(
       "codemirror.extension.basicSetup",
       async (cmCtx: CodeMirrorContext): Promise<ExtensionData<[]>> => {
