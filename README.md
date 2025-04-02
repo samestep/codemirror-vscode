@@ -8,9 +8,9 @@
 
 - [Motivation](#motivation)
 - [Usage](#usage)
-  * [Configuration](#configuration)
+  - [Configuration](#configuration)
 - [Extensibility](#extensibility)
-  * [Example](#example)
+  - [Example](#example)
 - [Contributing](#contributing)
 - [License](#license)
 

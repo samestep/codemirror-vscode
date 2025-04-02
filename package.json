@@ -74,7 +74,7 @@
     "typescript": "^5"
   },
   "scripts": {
-    "toc": "markdown-toc -i README.md",
+    "toc": "markdown-toc --bullets='-' -i README.md",
     "prettier-check": "prettier --check .",
     "prettier-write": "prettier --write .",
     "typescript": "tsc",
