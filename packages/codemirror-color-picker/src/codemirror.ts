@@ -160,9 +160,10 @@ export default async (options: Options): Promise<Extension> =>
           for (const { fmt, re } of regexes) {
             for (const match of str.matchAll(re)) {
               const { index } = match;
+              const absolute = from + index;
               const spec = {
                 widget: new ColorWidget(
-                  index,
+                  absolute,
                   fmt,
                   match[0],
                   (widget, parent) => {
@@ -172,7 +173,7 @@ export default async (options: Options): Promise<Extension> =>
                   },
                 ),
               };
-              ranges.push(Decoration.widget(spec).range(index));
+              ranges.push(Decoration.widget(spec).range(absolute));
             }
           }
         }
