@@ -5,8 +5,9 @@ import {
   sendableUpdates,
   Update,
 } from "@codemirror/collab";
+import { history, historyKeymap } from "@codemirror/commands";
 import { EditorState, Extension } from "@codemirror/state";
-import { EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
+import { EditorView, keymap, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import multiple from "./extensions/multiple";
 import {
   clientID,
@@ -100,12 +101,17 @@ const sync = (startVersion: number): Extension => [
 ];
 
 connection.request<StartResponse>({ kind: "start" }).then(async (start) => {
-  const { extensions, version, text, selection } = start;
+  const { historyConfig, extensions, version, text, selection } = start;
   new EditorView({
     state: EditorState.create({
       doc: text,
       selection,
-      extensions: [sync(version), await multiple(...extensions)],
+      extensions: [
+        sync(version),
+        history(historyConfig),
+        keymap.of(historyKeymap),
+        await multiple(...extensions),
+      ],
     }),
     parent: document.body,
     scrollTo: EditorView.scrollIntoView(selection.head, { y: "center" }),

@@ -44,9 +44,9 @@ To configure CodeMirror itself, add or remove items from the **`codemirror.exten
 
 Here is a list of the CodeMirror extensions included in this VS Code extension:
 
-- **`codemirror.extension.basicSetup`** is the `basicSetup` extension from the [`codemirror`](https://github.com/codemirror/basic-setup/tree/86f3699347713440e5b1a50b6a98d82963335d50) npm package, which "pulls together a number of extensions that you might want in a basic editor."
+- **`codemirror.extension.basicSetup`** is the `basicSetup` extension from the [`codemirror`](https://github.com/codemirror/basic-setup/tree/86f3699347713440e5b1a50b6a98d82963335d50) npm package, which "pulls together a number of extensions that you might want in a basic editor." The [`history`](https://codemirror.net/docs/ref/#h_undo_history) extension and its keymap are excluded, as this VS Code extension has undo history support built in.
 
-- **`codemirror.extension.minimalSetup`** is the `minimalSetup` extension from that same `codemirror` npm package, which is a "minimal set of extensions to create a functional editor."
+- **`codemirror.extension.minimalSetup`** is the `minimalSetup` extension from that same `codemirror` npm package, which is a "minimal set of extensions to create a functional editor." Similar to `basicSetup`, the `history` extension and its keymap are excluded.
 
 - **`codemirror.extension.wordWrap`** is the CodeMirror [`EditorView.lineWrapping`](https://codemirror.net/docs/ref/#view.EditorView^lineWrapping) extension, gated by the VS Code [`editor.wordWrap`](https://code.visualstudio.com/docs/editing/codebasics#_how-do-i-turn-on-word-wrap) setting.
 

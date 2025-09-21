@@ -8,6 +8,7 @@ import {
   dataToUpdates,
   ExtensionRequests,
   ExtensionResponds,
+  HistoryConfig,
   PullResponse,
   PushResponse,
   StartResponse,
@@ -100,6 +101,9 @@ export const sync = ({
       switch (request.kind) {
         case "start": {
           const response: StartResponse = {
+            historyConfig: vscode.workspace
+              .getConfiguration("codemirror")
+              .get<HistoryConfig>("history")!,
             extensions,
             version: document.version,
             text: document.getText(),

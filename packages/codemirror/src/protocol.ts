@@ -99,6 +99,19 @@ export const updatesToData = (updates: readonly Update[]): UpdateData[] =>
 export const dataToUpdates = (updates: UpdateData[]): readonly Update[] =>
   updates.map((u) => ({ changes: ChangeSet.fromJSON(u.changes), clientID }));
 
+/** Configuration for the CodeMirror `history` extension. */
+export interface HistoryConfig {
+  /**
+   * The minimum depth (amount of events) to store.
+   */
+  minDepth: number;
+  /**
+   * The maximum time (in milliseconds) that adjacent events can be
+   * apart and still be grouped together.
+   */
+  newGroupDelay: number;
+}
+
 /** Webview to extension: send the initial configuration. */
 export interface StartRequest {
   kind: "start";
@@ -106,6 +119,9 @@ export interface StartRequest {
 
 /** Extension responding to webview: here is the initial configuration. */
 export interface StartResponse {
+  /** Configuration for the CodeMirror `history` extension. */
+  historyConfig: HistoryConfig;
+
   /** CodeMirror extensions. */
   extensions: ExtensionData<any>[];
 
