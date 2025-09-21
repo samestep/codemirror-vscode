@@ -18,6 +18,7 @@ import {
   PullResponse,
   PushResponse,
   StartResponse,
+  TraceResponse,
   updatesToData,
   WebviewRequests,
   WebviewResponds,
@@ -38,6 +39,10 @@ const connection = new Connection<
     throw Error("impossible: request was sent to webview");
   },
 });
+
+const logTrace = async (message: any): Promise<void> => {
+  await connection.request<TraceResponse>({ kind: "trace", message });
+};
 
 const push = async (
   version: number,

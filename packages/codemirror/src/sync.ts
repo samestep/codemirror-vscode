@@ -12,6 +12,7 @@ import {
   PullResponse,
   PushResponse,
   StartResponse,
+  TraceResponse,
   UpdateData,
   updatesToData,
   WebviewRequests,
@@ -143,6 +144,11 @@ export const sync = ({
             }
           }
           const response: PushResponse = { accepted };
+          return response;
+        }
+        case "trace": {
+          // Already logged via `setOnMessage` above.
+          const response: TraceResponse = {};
           return response;
         }
       }

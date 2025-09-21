@@ -164,11 +164,30 @@ export interface PushResponse {
   accepted: boolean;
 }
 
+/** Webview to extension: please log this trace message. */
+export interface TraceRequest {
+  kind: "trace";
+
+  /** The message to log. */
+  message: any;
+}
+
+/** Extension responding to webview: trace message logged. */
+export interface TraceResponse {}
+
 /** Body of a request from webview to extension. */
-export type WebviewRequests = StartRequest | PullRequest | PushRequest;
+export type WebviewRequests =
+  | StartRequest
+  | PullRequest
+  | PushRequest
+  | TraceRequest;
 
 /** Body of a response from extension to webview. */
-export type ExtensionResponds = StartResponse | PullResponse | PushResponse;
+export type ExtensionResponds =
+  | StartResponse
+  | PullResponse
+  | PushResponse
+  | TraceResponse;
 
 /** Body of a request from extension to webview. */
 export type ExtensionRequests = never;
