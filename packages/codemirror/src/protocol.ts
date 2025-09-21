@@ -123,7 +123,7 @@ export interface StartResponse {
 export interface PullRequest {
   kind: "pull";
 
-  /** Only send updates after this version.. */
+  /** Only send updates after this version. */
   version: Version;
 }
 
